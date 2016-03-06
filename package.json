@@ -1,0 +1,47 @@
+{
+  "name": "prefix-emitter",
+  "version": "0.1.0",
+  "description": "Simple Event Emitter for ES6 and TypeScript based on Prefix Tree",
+  "main": "dist/prefix-emitter.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gnaeus/prefix-emitter.git"
+  },
+  "keywords": [
+    "event",
+    "emitter",
+    "pub/sub",
+    "trie"
+  ],
+  "author": "Dmitry Panyushkin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gnaeus/prefix-emitter/issues"
+  },
+  "homepage": "https://github.com/gnaeus/prefix-emitter#readme",
+  "dependencies": {
+    "core-js": "^2.1.3"
+  },
+  "devDependencies": {
+    "babel-core": "^6.6.5",
+    "babel-jest": "^9.0.0",
+    "babel-preset-es2015": "^6.6.0",
+    "jest-cli": "^0.9.0",
+    "typescript": "^1.8.7"
+  },
+  "jest": {
+    "rootDir": "./src",
+    "scriptPreprocessor": "../jest-preprocessor.js",
+    "testFileExtensions": [
+      "js",
+      "ts"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "ts"
+    ]
+  }
+}
