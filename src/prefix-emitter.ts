@@ -45,7 +45,25 @@ class EmitterSubscription implements Subscription {
             }
         }
         removeItem(node.handlers, this._handler);
-        cleanupTrie(this._args, nodeChain, node);
+        this._cleanupTrie(nodeChain, node);
+    }
+
+    private _cleanupTrie(nodeChain: TrieNode[], node: TrieNode): void {
+        for (let i = nodeChain.length - 1; i >= 0; --i) {
+            const parent = nodeChain[i];
+            if (node.children !== void 0 && node.children.size === 0) {
+                node.children = void 0;
+            }
+            if (node.children === void 0 && node.handlers.length === 0) {
+                parent.children.delete(this._args[i]);
+            } else {
+                return;
+            }
+            node = parent;
+        }
+        if (node.children !== void 0 && node.children.size === 0) {
+            node.children = void 0;
+        }
     }
 }
 
@@ -58,27 +76,31 @@ function removeItem(array: any[], item: any): void {
     }
 }
 
-function cleanupTrie(keyChain: any[], nodeChain: TrieNode[], node: TrieNode): void {
-    for (let i = nodeChain.length - 1; i >= 0; --i) {
-        const parent = nodeChain[i];
-        if (node.children !== void 0 && node.children.size === 0) {
-            node.children = void 0;
-        }
-        if (node.children === void 0 && node.handlers.length === 0) {
-            parent.children.delete(keyChain[i]);
-        } else {
-            return;
-        }
-        node = parent;
-    }
-    if (node.children !== void 0 && node.children.size === 0) {
-        node.children = void 0;
-    }
+export interface VoidEmitter {
+    on(handler: () => void): Subscription;
+    once(handler: () => void): Subscription;
+    emit(): void;
 }
 
-const emptyArgs = new Array();
+export interface SingleEmitter<T> {
+    on<T>(handler: (arg: T) => void): Subscription;
+    on<T>(arg: T, handler: () => void): Subscription;
+    once<T>(handler: (arg: T) => void): Subscription;
+    once<T>(arg: T, handler: () => void): Subscription;
+    emit<T>(arg: T): void;
+}
 
-export class Emitter {
+export interface DoubleEmitter<T1, T2> {
+    on(handler: (arg1: T1, arg2: T2) => void): Subscription;
+    on(arg1: T1, handler: (arg2: T2) => void): Subscription;
+    on(arg1: T1, arg2: T2, handler: () => void): Subscription;
+    once(handler: (arg1: T1, arg2: T2) => void): Subscription;
+    once(arg1: T1, handler: (arg2: T2) => void): Subscription;
+    once(arg1: T1, arg2: T2, handler: () => void): Subscription;
+    emit(arg1: T1, arg2: T2): void;
+}
+
+export class Emitter implements VoidEmitter, SingleEmitter<any>, DoubleEmitter<any, any> {
     private _node: TrieNode;
 
     constructor() {
@@ -101,31 +123,35 @@ export class Emitter {
         node.handlers.push(handler);
         return new EmitterSubscription(this._node, args, handler);
     }
-
-    on(args: string | any[] | Function, handler?: Function): Subscription {
-        if (typeof args === "function") {
-            handler = <Function>args;
-            args = emptyArgs;
-        } else if (typeof args === "string") {
-            args = [args];
+    
+    on(...args: Array<any | Function>): Subscription {
+        const lastIndex = arguments.length - 1;
+        if(lastIndex < 0) {
+            throw new Error("last argument is not a function");
         }
-        return this._on(<any[]>args, handler);
+        const handler = args[lastIndex] as Function;
+        if(typeof handler !== "function") {
+            throw new Error("last argument is not a function");
+        }
+        return this._on(args.slice(0, lastIndex), handler);
     }
-
-    once(args: string | any[] | Function, handler?: Function): Subscription {
-        if (typeof args === "function") {
-            handler = <Function>args;
-            args = emptyArgs;
-        } else if (typeof args === "string") {
-            args = [args];
+    
+    once(...args: Array<any | Function>): Subscription {
+        const lastIndex = arguments.length - 1;
+        if (lastIndex < 0) {
+            throw new Error("last argument is not a function");
         }
-        const subscription = this._on(<any[]>args, function () {
+        const handler = args[lastIndex] as Function;
+        if (typeof handler !== "function") {
+            throw new Error("last argument is not a function");
+        }
+        const subscription = this._on(args.slice(0, lastIndex), (...args: any[]) => {
             subscription.dispose();
-            handler.apply(void 0, arguments);
+            handler(...args);
         });
         return subscription;
     }
-
+    
     emit(...args: any[]): void {
         let node = this._node;
         let handlers = node.handlers;
@@ -160,6 +186,13 @@ interface Handler {
 const _handlers = Symbol("_handlers");
 const _subscriptions = Symbol("_subscriptions");
 
+export function on(emitter: VoidEmitter): MethodDecorator;
+export function on<T>(emitter: SingleEmitter<T>): MethodDecorator;
+export function on<T>(emitter: SingleEmitter<T>, arg: T): MethodDecorator;
+export function on<T1, T2>(emitter: DoubleEmitter<T1, T2>): MethodDecorator;
+export function on<T1, T2>(emitter: DoubleEmitter<T1, T2>, arg1: T1): MethodDecorator;
+export function on<T1, T2>(emitter: DoubleEmitter<T1, T2>, arg1: T1, arg2: T2): MethodDecorator;
+export function on(emitter: Emitter, ...args: any[]): MethodDecorator;
 export function on(emitter: Emitter, ...args: any[]): MethodDecorator {
     return (target: Object, key: string | symbol, descriptor: PropertyDescriptor) => {
         let handlers: Handler[] = target[_handlers];
@@ -172,6 +205,12 @@ export function on(emitter: Emitter, ...args: any[]): MethodDecorator {
     }
 }
 
+export function once(emitter: VoidEmitter): MethodDecorator;
+export function once<T>(emitter: SingleEmitter<T>): MethodDecorator;
+export function once<T>(emitter: SingleEmitter<T>, arg: T): MethodDecorator;
+export function once<T1, T2>(emitter: DoubleEmitter<T1, T2>): MethodDecorator;
+export function once<T1, T2>(emitter: DoubleEmitter<T1, T2>, arg1: T1): MethodDecorator;
+export function once<T1, T2>(emitter: DoubleEmitter<T1, T2>, arg1: T1, arg2: T2): MethodDecorator;
 export function once(emitter: Emitter, ...args: any[]): MethodDecorator {
     return (target: Object, key: string | symbol, descriptor: PropertyDescriptor) => {
         let handlers: Handler[] = target[_handlers];
@@ -190,8 +229,8 @@ export function injectSubscriptions(target: Object): void {
         target[_subscriptions] = handlers.map(h => {
             const method: Function = target[h.key].bind(target);
             return h.once
-                ? h.emitter.once(h.args, method)
-                : h.emitter.on(h.args, method);
+                ? h.emitter.once(...h.args, method)
+                : h.emitter.on(...h.args, method);
         });
     }
 }

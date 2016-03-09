@@ -4,11 +4,11 @@
  */
 jest.dontMock("../prefix-emitter.ts");
 
-import {Emitter, Subscription} from "../prefix-emitter.ts";
+import {Emitter, VoidEmitter, DoubleEmitter, Subscription} from "../prefix-emitter.ts";
 
 describe("Prefix Emitter", () => {
     it("should work without parameters", () => {
-        const emitter = new Emitter();
+        const emitter: VoidEmitter = new Emitter();
         let handlerCalls = 0;
 
         emitter.on(() => { handlerCalls++; });
@@ -21,7 +21,7 @@ describe("Prefix Emitter", () => {
     });
 
     it("should work with string events", () => {
-        const emitter = new Emitter();
+        const emitter: DoubleEmitter<string, any> = new Emitter();
         let handlerCalls = 0;
 
         emitter.on("fired", (arg: any) => {
@@ -55,20 +55,20 @@ describe("Prefix Emitter", () => {
             expect(arg4).toBe("arg4");
         });
 
-        emitter.on(["arg1"], (arg2: any, arg3: any, arg4: any) => {
+        emitter.on("arg1", (arg2: any, arg3: any, arg4: any) => {
             handlerCalls++;
             expect(arg2).toBe("arg2");
             expect(arg3).toBe("arg3");
             expect(arg4).toBe("arg4");
         });
         
-        emitter.once(["arg1", "arg2"], (arg3: any, arg4: any) => {
+        emitter.once("arg1", "arg2", (arg3: any, arg4: any) => {
             handlerCalls++;
             expect(arg3).toBe("arg3");
             expect(arg4).toBe("arg4");
         });
 
-        emitter.once(["arg1", "arg2", "arg3"], (arg4: any) => {
+        emitter.once("arg1", "arg2", "arg3", (arg4: any) => {
             handlerCalls++;
             expect(arg4).toBe("arg4");
         });
@@ -79,19 +79,19 @@ describe("Prefix Emitter", () => {
     });
 
     it("should work with object prefixes", () => {
-        const emitter = new Emitter();
+        const emitter: DoubleEmitter<Object, any> = new Emitter();
         let handlerCalls = 0;
         const params = {
             foo: { foo: "bar" },
             bar: { bar: "foo" },
         };
 
-        emitter.on([params.foo], (arg2: any) => {
+        emitter.on(params.foo, (arg2: any) => {
             handlerCalls++;
             expect(arg2).toBe(params.bar);
         });
 
-        emitter.once([params.foo, params.bar], () => {
+        emitter.once(params.foo, params.bar, () => {
             handlerCalls++;
         });
 
@@ -107,9 +107,9 @@ describe("Prefix Emitter", () => {
 
         subscriptions.push(emitter.on(() => { }));
         subscriptions.push(emitter.on("first", () => { }));
-        subscriptions.push(emitter.on(["first", "second"], () => { }));
-        subscriptions.push(emitter.on(["first", "third"], () => { }));
-        subscriptions.push(emitter.on(["first", "second", "third", "fourth"], () => { }));
+        subscriptions.push(emitter.on("first", "second", () => { }));
+        subscriptions.push(emitter.on("first", "third", () => { }));
+        subscriptions.push(emitter.on("first", "second", "third", "fourth", () => { }));
 
         expect(emitter["_node"].handlers.length).not.toEqual(0);
         expect(emitter["_node"].children.size).not.toEqual(0);

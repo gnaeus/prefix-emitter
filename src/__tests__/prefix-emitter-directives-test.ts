@@ -4,10 +4,11 @@
  */
 jest.dontMock("../prefix-emitter.ts");
 
-import {Emitter, on, once, injectSubscriptions, disposeSubscriptions} from "../prefix-emitter.ts";
+import {Emitter, VoidEmitter, DoubleEmitter} from "../prefix-emitter.ts";
+import {on, once, injectSubscriptions, disposeSubscriptions} from "../prefix-emitter.ts";
 
-const firstEmitter = new Emitter();
-const secondEmitter = new Emitter();
+const firstEmitter: DoubleEmitter<string, string> = new Emitter();
+const secondEmitter: VoidEmitter = new Emitter();
 
 class Component {
     public onInitCalls: number;
@@ -156,8 +157,8 @@ describe("Emitter Directives", () => {
     it("should work with class inhetitance: subscribed only on Base", () => {
         const derived = new Derived();
 
-        firstEmitter.emit();
-        firstEmitter.emit();
+        firstEmitter.emit("event", "event-1");
+        firstEmitter.emit("event", "event-2");
 
         derived.dispose();
 
