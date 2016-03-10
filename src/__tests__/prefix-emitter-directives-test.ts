@@ -4,11 +4,11 @@
  */
 jest.dontMock("../prefix-emitter.ts");
 
-import {Emitter, VoidEmitter, DoubleEmitter} from "../prefix-emitter.ts";
+import {PrefixEmitter, VoidEmitter, DoubleEmitter} from "../prefix-emitter.ts";
 import {on, once, injectSubscriptions, disposeSubscriptions} from "../prefix-emitter.ts";
 
-const firstEmitter: DoubleEmitter<string, string> = new Emitter();
-const secondEmitter: VoidEmitter = new Emitter();
+const firstEmitter: DoubleEmitter<string, string> = new PrefixEmitter();
+const secondEmitter: VoidEmitter = new PrefixEmitter();
 
 class Component {
     public onInitCalls: number;

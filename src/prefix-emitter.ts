@@ -100,7 +100,7 @@ export interface DoubleEmitter<T1, T2> {
     emit(arg1: T1, arg2: T2): void;
 }
 
-export class Emitter implements VoidEmitter, SingleEmitter<any>, DoubleEmitter<any, any> {
+export class PrefixEmitter implements VoidEmitter, SingleEmitter<any>, DoubleEmitter<any, any> {
     private _node: TrieNode;
 
     constructor() {
@@ -177,7 +177,7 @@ export class Emitter implements VoidEmitter, SingleEmitter<any>, DoubleEmitter<a
 }
 
 interface Handler {
-    emitter: Emitter,
+    emitter: PrefixEmitter,
     args: any[],
     key: string | symbol,
     once?: boolean,
@@ -192,8 +192,8 @@ export function on<T>(emitter: SingleEmitter<T>, arg: T): MethodDecorator;
 export function on<T1, T2>(emitter: DoubleEmitter<T1, T2>): MethodDecorator;
 export function on<T1, T2>(emitter: DoubleEmitter<T1, T2>, arg1: T1): MethodDecorator;
 export function on<T1, T2>(emitter: DoubleEmitter<T1, T2>, arg1: T1, arg2: T2): MethodDecorator;
-export function on(emitter: Emitter, ...args: any[]): MethodDecorator;
-export function on(emitter: Emitter, ...args: any[]): MethodDecorator {
+export function on(emitter: PrefixEmitter, ...args: any[]): MethodDecorator;
+export function on(emitter: PrefixEmitter, ...args: any[]): MethodDecorator {
     return (target: Object, key: string | symbol, descriptor: PropertyDescriptor) => {
         let handlers: Handler[] = target[_handlers];
         if (handlers === void 0) {
@@ -211,7 +211,7 @@ export function once<T>(emitter: SingleEmitter<T>, arg: T): MethodDecorator;
 export function once<T1, T2>(emitter: DoubleEmitter<T1, T2>): MethodDecorator;
 export function once<T1, T2>(emitter: DoubleEmitter<T1, T2>, arg1: T1): MethodDecorator;
 export function once<T1, T2>(emitter: DoubleEmitter<T1, T2>, arg1: T1, arg2: T2): MethodDecorator;
-export function once(emitter: Emitter, ...args: any[]): MethodDecorator {
+export function once(emitter: PrefixEmitter, ...args: any[]): MethodDecorator {
     return (target: Object, key: string | symbol, descriptor: PropertyDescriptor) => {
         let handlers: Handler[] = target[_handlers];
         if (handlers === void 0) {

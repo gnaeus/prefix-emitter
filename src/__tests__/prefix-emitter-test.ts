@@ -4,11 +4,11 @@
  */
 jest.dontMock("../prefix-emitter.ts");
 
-import {Emitter, VoidEmitter, DoubleEmitter, Subscription} from "../prefix-emitter.ts";
+import {PrefixEmitter, VoidEmitter, DoubleEmitter, Subscription} from "../prefix-emitter.ts";
 
 describe("Prefix Emitter", () => {
     it("should work without parameters", () => {
-        const emitter: VoidEmitter = new Emitter();
+        const emitter: VoidEmitter = new PrefixEmitter();
         let handlerCalls = 0;
 
         emitter.on(() => { handlerCalls++; });
@@ -21,7 +21,7 @@ describe("Prefix Emitter", () => {
     });
 
     it("should work with string events", () => {
-        const emitter: DoubleEmitter<string, any> = new Emitter();
+        const emitter: DoubleEmitter<string, any> = new PrefixEmitter();
         let handlerCalls = 0;
 
         emitter.on("fired", (arg: any) => {
@@ -44,7 +44,7 @@ describe("Prefix Emitter", () => {
     });
 
     it("should work with rest parameters", () => {
-        const emitter = new Emitter();
+        const emitter = new PrefixEmitter();
         let handlerCalls = 0;
 
         emitter.on((arg1: any, arg2: any, arg3: any, arg4: any) => {
@@ -79,7 +79,7 @@ describe("Prefix Emitter", () => {
     });
 
     it("should work with object prefixes", () => {
-        const emitter: DoubleEmitter<Object, any> = new Emitter();
+        const emitter: DoubleEmitter<Object, any> = new PrefixEmitter();
         let handlerCalls = 0;
         const params = {
             foo: { foo: "bar" },
@@ -102,7 +102,7 @@ describe("Prefix Emitter", () => {
     });
 
     it("should cleanup subscriptions trie", () => {
-        const emitter = new Emitter();
+        const emitter = new PrefixEmitter();
         const subscriptions = new Array<Subscription>();
 
         subscriptions.push(emitter.on(() => { }));
