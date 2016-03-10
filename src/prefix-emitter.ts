@@ -90,14 +90,14 @@ export interface SingleEmitter<T> {
     emit<T>(arg: T): void;
 }
 
-export interface DoubleEmitter<T1, T2> {
-    on(handler: (arg1: T1, arg2: T2) => void): Subscription;
-    on(arg1: T1, handler: (arg2: T2) => void): Subscription;
-    on(arg1: T1, arg2: T2, handler: () => void): Subscription;
-    once(handler: (arg1: T1, arg2: T2) => void): Subscription;
-    once(arg1: T1, handler: (arg2: T2) => void): Subscription;
-    once(arg1: T1, arg2: T2, handler: () => void): Subscription;
-    emit(arg1: T1, arg2: T2): void;
+export interface DoubleEmitter<TEvent, TArg> {
+    on(handler: (event: TEvent, arg: TArg) => void): Subscription;
+    on(event: TEvent, handler: (arg: TArg) => void): Subscription;
+    on(event: TEvent, arg: TArg, handler: () => void): Subscription;
+    once(handler: (event: TEvent, arg: TArg) => void): Subscription;
+    once(event: TEvent, handler: (arg: TArg) => void): Subscription;
+    once(event: TEvent, arg: TArg, handler: () => void): Subscription;
+    emit(event: TEvent, arg: TArg): void;
 }
 
 export class PrefixEmitter implements VoidEmitter, SingleEmitter<any>, DoubleEmitter<any, any> {
@@ -189,9 +189,9 @@ const _subscriptions = Symbol("_subscriptions");
 export function on(emitter: VoidEmitter): MethodDecorator;
 export function on<T>(emitter: SingleEmitter<T>): MethodDecorator;
 export function on<T>(emitter: SingleEmitter<T>, arg: T): MethodDecorator;
-export function on<T1, T2>(emitter: DoubleEmitter<T1, T2>): MethodDecorator;
-export function on<T1, T2>(emitter: DoubleEmitter<T1, T2>, arg1: T1): MethodDecorator;
-export function on<T1, T2>(emitter: DoubleEmitter<T1, T2>, arg1: T1, arg2: T2): MethodDecorator;
+export function on<TEvent, TArg>(emitter: DoubleEmitter<TEvent, TArg>): MethodDecorator;
+export function on<TEvent, TArg>(emitter: DoubleEmitter<TEvent, TArg>, event: TEvent): MethodDecorator;
+export function on<TEvent, TArg>(emitter: DoubleEmitter<TEvent, TArg>, event: TEvent, arg: TArg): MethodDecorator;
 export function on(emitter: PrefixEmitter, ...args: any[]): MethodDecorator;
 export function on(emitter: PrefixEmitter, ...args: any[]): MethodDecorator {
     return (target: Object, key: string | symbol, descriptor: PropertyDescriptor) => {
@@ -208,9 +208,10 @@ export function on(emitter: PrefixEmitter, ...args: any[]): MethodDecorator {
 export function once(emitter: VoidEmitter): MethodDecorator;
 export function once<T>(emitter: SingleEmitter<T>): MethodDecorator;
 export function once<T>(emitter: SingleEmitter<T>, arg: T): MethodDecorator;
-export function once<T1, T2>(emitter: DoubleEmitter<T1, T2>): MethodDecorator;
-export function once<T1, T2>(emitter: DoubleEmitter<T1, T2>, arg1: T1): MethodDecorator;
-export function once<T1, T2>(emitter: DoubleEmitter<T1, T2>, arg1: T1, arg2: T2): MethodDecorator;
+export function once<TEvent, TArg>(emitter: DoubleEmitter<TEvent, TArg>): MethodDecorator;
+export function once<TEvent, TArg>(emitter: DoubleEmitter<TEvent, TArg>, event: TEvent): MethodDecorator;
+export function once<TEvent, TArg>(emitter: DoubleEmitter<TEvent, TArg>, event: TEvent, arg: TArg): MethodDecorator;
+export function once(emitter: PrefixEmitter, ...args: any[]): MethodDecorator;
 export function once(emitter: PrefixEmitter, ...args: any[]): MethodDecorator {
     return (target: Object, key: string | symbol, descriptor: PropertyDescriptor) => {
         let handlers: Handler[] = target[_handlers];
