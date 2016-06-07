@@ -83,11 +83,11 @@ export interface VoidEmitter {
 }
 
 export interface SingleEmitter<T> {
-    on<T>(handler: (arg: T) => void): Subscription;
-    on<T>(arg: T, handler: () => void): Subscription;
-    once<T>(handler: (arg: T) => void): Subscription;
-    once<T>(arg: T, handler: () => void): Subscription;
-    emit<T>(arg: T): void;
+    on(handler: (arg: T) => void): Subscription;
+    on(arg: T, handler: () => void): Subscription;
+    once(handler: (arg: T) => void): Subscription;
+    once(arg: T, handler: () => void): Subscription;
+    emit(arg: T): void;
 }
 
 export interface DoubleEmitter<TEvent, TArg> {
