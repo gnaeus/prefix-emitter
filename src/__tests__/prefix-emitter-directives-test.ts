@@ -2,10 +2,10 @@
  * Copyright (c) 2016 Dmitry Panyushkin
  * Available under MIT license
  */
-jest.dontMock("../prefix-emitter.ts");
+jest.unmock("../prefix-emitter");
 
-import {PrefixEmitter, VoidEmitter, DoubleEmitter} from "../prefix-emitter.ts";
-import {on, once, injectSubscriptions, disposeSubscriptions} from "../prefix-emitter.ts";
+import {PrefixEmitter, VoidEmitter, DoubleEmitter} from "../prefix-emitter";
+import {on, once, injectSubscriptions, disposeSubscriptions} from "../prefix-emitter";
 
 const firstEmitter: DoubleEmitter<string, string> = new PrefixEmitter();
 const secondEmitter: VoidEmitter = new PrefixEmitter();

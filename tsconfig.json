@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
+    "target": "es5",
+    "module": "umd",
+    "noLib": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": false,
     "noImplicitAny" : true,
@@ -11,8 +12,6 @@
     "sourceMap": true
   },
   "exclude": [
-    "node_modules",
-    "typings/main",
-    "typings/main.d.ts"
+    "node_modules"
   ]
 }

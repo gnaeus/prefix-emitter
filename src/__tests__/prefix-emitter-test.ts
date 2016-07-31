@@ -2,9 +2,9 @@
  * Copyright (c) 2016 Dmitry Panyushkin
  * Available under MIT license
  */
-jest.dontMock("../prefix-emitter.ts");
+jest.unmock("../prefix-emitter");
 
-import {PrefixEmitter, VoidEmitter, DoubleEmitter, Subscription} from "../prefix-emitter.ts";
+import {PrefixEmitter, VoidEmitter, DoubleEmitter, Subscription} from "../prefix-emitter";
 
 describe("Prefix Emitter", () => {
     it("should work without parameters", () => {

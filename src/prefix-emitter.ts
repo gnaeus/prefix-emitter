@@ -2,6 +2,7 @@
  * Copyright (c) 2016 Dmitry Panyushkin
  * Available under MIT license
  */
+
 interface TrieNode {
     handlers: Function[],
     children?: Map<any, TrieNode>,

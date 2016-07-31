@@ -4,6 +4,8 @@
   "description": "Simple Event Emitter for ES6 and TypeScript based on Prefix Tree",
   "main": "dist/prefix-emitter.js",
   "scripts": {
+    "build": "",
+    "build-dev": "",
     "postinstall": "typings install",
     "test": "jest"
   },
@@ -23,27 +25,12 @@
     "url": "https://github.com/gnaeus/prefix-emitter/issues"
   },
   "homepage": "https://github.com/gnaeus/prefix-emitter#readme",
-  "dependencies": {
-    "core-js": "^2.1.3"
-  },
   "devDependencies": {
-    "babel-core": "^6.6.5",
-    "babel-jest": "^9.0.0",
-    "babel-preset-es2015": "^6.6.0",
-    "jest-cli": "^0.9.0",
-    "typescript": "^1.8.7",
-    "typings": "^0.7.5"
   },
   "jest": {
     "rootDir": "./src",
     "scriptPreprocessor": "../jest-preprocessor.js",
-    "testFileExtensions": [
-      "js",
-      "ts"
-    ],
-    "moduleFileExtensions": [
-      "js",
-      "ts"
-    ]
+    "testFileExtensions": [ "js", "ts" ],
+    "moduleFileExtensions": [ "js", "ts" ]
   }
 }

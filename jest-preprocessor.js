@@ -1,4 +1,3 @@
-var babelJest = require('babel-jest');
 var ts = require("typescript");
 var fs = require('fs');
 
@@ -10,7 +9,6 @@ module.exports = {
       if (filename.indexOf(".ts") === filename.length - 3) {
           src = ts.transpile(src, tsconfig);
       }
-      src = babelJest.process(src, filename);
     }
     return src;
   }
