@@ -1,18 +1,16 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "noLib": true,
+    "target": "es6",
+    "declaration": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": false,
     "noImplicitAny" : true,
     "noImplicitReturns": true,
     "preserveConstEnums": true,
     "suppressImplicitAnyIndexErrors": true,
-    "sourceMap": true
+    "outDir": "dist/__typings"
   },
-  "exclude": [
-    "node_modules",
-    "dist"
+  "files": [
+    "src/prefix-emitter.ts"
   ]
 }

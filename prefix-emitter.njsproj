@@ -23,10 +23,10 @@
     <None Include="LICENSE" />
     <None Include="package.json" />
     <None Include="tsconfig.json" />
+    <None Include="tsconfig.typings.json" />
     <None Include="typings.json" />
     <None Include="README.md" />
     <None Include="jest-preprocessor.js" />
-    <None Include="dts-generator.js" />
     <None Include="webpack.config.js" />
     <None Include="dist\**" />
     <None Include="typings\**\*.json" />
