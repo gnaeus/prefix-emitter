@@ -30,6 +30,7 @@
     <None Include="webpack.config.js" />
     <None Include="dist\**" />
     <None Include="typings\**\*.json" />
+    <None Include="src\es5-fallback.js" />
     <TypeScriptCompile Include="src\lib.es6.d.ts" />
     <TypeScriptCompile Include="typings\**\*.d.ts" />
     <TypeScriptCompile Include="src\prefix-emitter.ts" />

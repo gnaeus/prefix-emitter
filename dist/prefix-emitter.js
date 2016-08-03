@@ -52,13 +52,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * Copyright (c) 2016 Dmitry Panyushkin
-	 * Available under MIT license
-	 */
 	"use strict";
+	var fallback = __webpack_require__(1);
+	// we don't register polyfill — use local scoped fallback instead
+	var _Map = typeof Map !== "undefined" ? Map : fallback.Map;
+	var _Symbol = typeof Symbol !== "undefined" ? Symbol : fallback.Symbol;
 	var EmitterSubscription = (function () {
 	    function EmitterSubscription(node, args, handler) {
 	        this._node = node;
@@ -124,7 +124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var node = this._node;
 	        for (var i = 0; i < args.length; ++i) {
 	            if (node.children === void 0) {
-	                node.children = new Map();
+	                node.children = new _Map();
 	            }
 	            var child = node.children.get(args[i]);
 	            if (child === void 0) {
@@ -203,8 +203,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return PrefixEmitter;
 	}());
 	exports.PrefixEmitter = PrefixEmitter;
-	var _handlers = Symbol("_handlers");
-	var _subscriptions = Symbol("_subscriptions");
+	var _handlers = _Symbol("__prefix_emitter_handlers_");
+	var _subscriptions = _Symbol("__prefix_emitter_subscriptions_");
 	function on(emitter) {
 	    var args = [];
 	    for (var _i = 1; _i < arguments.length; _i++) {
@@ -261,6 +261,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.disposeSubscriptions = disposeSubscriptions;
 
+
+/***/ },
+/* 1 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	function MapFallback() {
+	    this._store = Object.create(null);
+	    this.size = 0;
+	}
+	
+	MapFallback.prototype.has = function (key) {
+	    return this._store[key] !== void 0;
+	}
+	
+	MapFallback.prototype.get = function (key) {
+	    return this._store[key];
+	}
+	
+	MapFallback.prototype.set = function (key, value) {
+	    if (this._store[key] === void 0) {
+	        this.size++;
+	    }
+	    this._store[key] = value;
+	}
+	
+	MapFallback.prototype.delete = function (key) {
+	    if (this._store[key] !== void 0) {
+	        this.size--;
+	        delete this._store[key];
+	    }
+	}
+	
+	function SymbolFallback(key) {
+	    if (typeof key !== "string" && typeof key !== "number") {
+	        throw new Error("Symbol not supported");
+	    }
+	    return key;
+	}
+	
+	module.exports = {
+	    Map: MapFallback,
+	    Symbol: SymbolFallback,
+	}
 
 /***/ }
 /******/ ])

@@ -3,6 +3,7 @@
  * Available under MIT license
  */
 jest.unmock("../prefix-emitter");
+jest.unmock("../es5-fallback.js");
 
 import {PrefixEmitter, VoidEmitter, DoubleEmitter} from "../prefix-emitter";
 import {on, once, injectSubscriptions, disposeSubscriptions} from "../prefix-emitter";

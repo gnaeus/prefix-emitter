@@ -2,6 +2,12 @@
  * Copyright (c) 2016 Dmitry Panyushkin
  * Available under MIT license
  */
+declare function require(path: string): any;
+const fallback = require("./es5-fallback.js");
+
+// we don't register polyfill - we use local scoped fallback instead
+const _Map: MapConstructor = typeof Map !== "undefined" ? Map : fallback.Map;
+const _Symbol: SymbolConstructor = typeof Symbol !== "undefined" ? Symbol : fallback.Symbol;
 
 interface TrieNode {
     handlers: Function[],
@@ -112,7 +118,7 @@ export class PrefixEmitter implements VoidEmitter, SingleEmitter<any>, DoubleEmi
         let node = this._node;
         for (let i = 0; i < args.length; ++i) {
             if (node.children === void 0) {
-                node.children = new Map<any, TrieNode>();
+                node.children = new _Map<any, TrieNode>();
             }
             let child = node.children.get(args[i]);
             if (child === void 0) {
@@ -184,8 +190,8 @@ interface Handler {
     once?: boolean,
 }
 
-const _handlers = Symbol("_handlers");
-const _subscriptions = Symbol("_subscriptions");
+const _handlers = _Symbol("__prefix_emitter_handlers_");
+const _subscriptions = _Symbol("__prefix_emitter_subscriptions_");
 
 export function on(emitter: VoidEmitter): MethodDecorator;
 export function on<T>(emitter: SingleEmitter<T>): MethodDecorator;
