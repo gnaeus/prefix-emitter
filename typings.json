@@ -1,4 +1,7 @@
 {
+  "name": "prefix-emitter",
+  "main": "dist/prefix-emitter.d.ts",
+  "version": "0.1.0",
   "globalDevDependencies": {
     "jest": "registry:dt/jest#0.9.0+20160706021812"
   }
