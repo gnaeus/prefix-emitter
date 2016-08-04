@@ -352,10 +352,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	exports.removeItem = removeItem;
+	function repeat(count, template, sep) {
+	    if (sep === void 0) { sep = ""; }
+	    var arr = [];
+	    for (var i = 0; i < count; ++i) {
+	        arr.push(template(i));
+	    }
+	    return arr.join(sep);
+	}
+	/**
+	 * Build new function from given one with injected logic at the beginning of function call.
+	 * @param target Function: target function
+	 * @param logic Function: injected logic
+	 * @returns Function
+	 */
+	function extendFunction(target, logic) {
+	    // unique prefix for Function constructor for
+	    // eliminate conflicts with `target` functions names
+	    var pr = "bvjxRy0LjL9D";
+	    // Code generation is used to preserve target's `.name` and `.length`
+	    // It is about 30x slower than simple funciton wrapping
+	    // But it is slill less than 5 microseconds per call
+	    // So if you have 200 decorated classes it took less then 1ms
+	    var factory = new Function(pr + "target", pr + "logic", "\n        return function " + target.name + "(" + repeat(target.length, function (i) { return "v" + i; }, ", ") + ") {\n            " + pr + "logic.apply(this, arguments);\n            return " + pr + "target.apply(this, arguments);\n        };\n    ");
+	    return factory(target, logic);
+	}
+	exports.extendFunction = extendFunction;
 	/**
 	 * Build new constructor from given one with injected logic at the beginning of constructor call.
-	 * @param target Function
-	 * @param logic Function
+	 * @param target Function: target constructor
+	 * @param logic Function: injected logic
 	 * @returns Function
 	 */
 	function extendConstructor(target, logic) {
@@ -364,19 +390,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return constructor;
 	}
 	exports.extendConstructor = extendConstructor;
-	/**
-	 * Build new function from given one with injected logic at the beginning of function call.
-	 * @param target Function
-	 * @param logic Function
-	 * @returns Function
-	 */
-	function extendFunction(target, logic) {
-	    return function () {
-	        logic.apply(this, arguments);
-	        return target.apply(this, arguments);
-	    };
-	}
-	exports.extendFunction = extendFunction;
 
 
 /***/ },

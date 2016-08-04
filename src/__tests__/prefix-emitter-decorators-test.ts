@@ -224,4 +224,23 @@ describe("Emitter Directives", () => {
         expect(derived.onBaseCalls).toBe(0);
         expect(derived.onOverriddenCalls).toBe(4);
     });
+
+    it("should preserve decorated class prototype, name and constructor args length", () => {
+        class PlainClass { }
+
+        @injectSubscriptions
+        class DecoratedClass extends PlainClass {
+            constructor(a: any, b: any, c: any) {
+                super();
+            }
+        }
+
+        expect(DecoratedClass.name).toEqual("DecoratedClass");
+        expect(DecoratedClass.length).toEqual(3);
+
+        const instance = new DecoratedClass(1, 2, 3);
+
+        expect(instance instanceof DecoratedClass).toBeTruthy();
+        expect(instance instanceof PlainClass).toBeTruthy();
+    });
 });
