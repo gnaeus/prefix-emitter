@@ -14,6 +14,13 @@ interface TrieNode {
     children?: Map<any, TrieNode>,
 }
 
+/**
+ * Subscription to event at some prefix.
+ * Used only for unsubscribe from this event by calling `dispose()` method.
+ * @example
+ * const subscription = emitter.on("event", (arg) => { console.log(arg); });
+ * subscription.dispose(); // event handler will be removed
+ */
 export interface Subscription {
     dispose(): void,
 }
@@ -83,12 +90,25 @@ function removeItem(array: any[], item: any): void {
     }
 }
 
+/**
+ * Emitter interface without argumens.
+ * @example
+ * const emitter: VoidEmitter = new PrefixEmitter();
+ * const subscription = emitter.on(() => { console.log("fired"); });
+ */
 export interface VoidEmitter {
     on(handler: () => void): Subscription;
     once(handler: () => void): Subscription;
     emit(): void;
 }
 
+/**
+ * Emitter interface with one argument.
+ * @example
+ * const emitter: SingleEmitter<string> = new PrefixEmitter();
+ * const sub1 = emitter.on((msg: string) => { console.log(msg); });
+ * const sub2 = emitter.on("some-event", () => { console.log("some-event fired"); });
+ */
 export interface SingleEmitter<T> {
     on(handler: (arg: T) => void): Subscription;
     on(arg: T, handler: () => void): Subscription;
@@ -97,6 +117,13 @@ export interface SingleEmitter<T> {
     emit(arg: T): void;
 }
 
+/**
+ * Emitter interface with two arguments.
+ * @example
+ * const emitter: DoubleEmitter<string, any> = new PrefixEmitter();
+ * const sub1 = emitter.on("first-event", (arg: any) => { console.log("first-event:", arg); });
+ * const sub2 = emitter.on("second-event", (arg: any) => { console.log("second-event:", arg); });
+ */
 export interface DoubleEmitter<TEvent, TArg> {
     on(handler: (event: TEvent, arg: TArg) => void): Subscription;
     on(event: TEvent, handler: (arg: TArg) => void): Subscription;
@@ -107,6 +134,13 @@ export interface DoubleEmitter<TEvent, TArg> {
     emit(event: TEvent, arg: TArg): void;
 }
 
+/**
+ * Event Emitter which can bind handlers to events at some sequence of prefixes.
+ * @example
+ * const emitter = new PrefixEmitter();
+ * const sub1 = emitter.on("/event", (subEvent, arg) => { console.log("/event:", subEvent, arg); });
+ * const sub2 = emitter.on("/event", "/subevent", (arg) => { console.log("/event/subevent", arg); });
+ */
 export class PrefixEmitter implements VoidEmitter, SingleEmitter<any>, DoubleEmitter<any, any> {
     private _node: TrieNode;
 
@@ -130,7 +164,12 @@ export class PrefixEmitter implements VoidEmitter, SingleEmitter<any>, DoubleEmi
         node.handlers.push(handler);
         return new EmitterSubscription(this._node, args, handler);
     }
-    
+
+    /**
+     * Subscribe to some event of this Emitter.
+     * @param args Array: sequence of event prefixes and event handler function at last position
+     * @returns Subscription: created subscription to event
+     */
     on(...args: Array<any | Function>): Subscription {
         const lastIndex = arguments.length - 1;
         if(lastIndex < 0) {
@@ -142,7 +181,12 @@ export class PrefixEmitter implements VoidEmitter, SingleEmitter<any>, DoubleEmi
         }
         return this._on(args.slice(0, lastIndex), handler);
     }
-    
+
+    /**
+     * Subscribe to some event of this Emitter. Subscription will be disposed after single handler call.
+     * @param args Array: sequence of event prefixes and event handler function at last position
+     * @returns Subscription: created subscription to event
+     */
     once(...args: Array<any | Function>): Subscription {
         const lastIndex = arguments.length - 1;
         if (lastIndex < 0) {
@@ -158,7 +202,11 @@ export class PrefixEmitter implements VoidEmitter, SingleEmitter<any>, DoubleEmi
         });
         return subscription;
     }
-    
+
+    /**
+     * Emit an event
+     * @param args Array: event prefixes then event arguments
+     */
     emit(...args: any[]): void {
         let node = this._node;
         let handlers = node.handlers;
@@ -193,6 +241,11 @@ interface Handler {
 const _handlers = _Symbol("__prefix_emitter_handlers_");
 const _subscriptions = _Symbol("__prefix_emitter_subscriptions_");
 
+/**
+ * Method Decorator for subscribe to Emitter at some prefix described by rest parameters.
+ * @param emitter PrefixEmitter
+ * @param args Array
+ */
 export function on(emitter: VoidEmitter): MethodDecorator;
 export function on<T>(emitter: SingleEmitter<T>): MethodDecorator;
 export function on<T>(emitter: SingleEmitter<T>, arg: T): MethodDecorator;
@@ -212,6 +265,12 @@ export function on(emitter: PrefixEmitter, ...args: any[]): MethodDecorator {
     }
 }
 
+/**
+ * Method Decorator for subscribe to Emitter at some prefix described by rest parameters.
+ * Subscription will be disposed after single method call.
+ * @param emitter PrefixEmitter
+ * @param args Array
+ */
 export function once(emitter: VoidEmitter): MethodDecorator;
 export function once<T>(emitter: SingleEmitter<T>): MethodDecorator;
 export function once<T>(emitter: SingleEmitter<T>, arg: T): MethodDecorator;
