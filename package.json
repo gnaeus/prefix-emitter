@@ -8,8 +8,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "webpack & build-typings",
-    "build-dev": "webpack --watch",
+    "build": "rimraf dist && webpack && npm run build-typings",
+    "build-dev": "rimraf dist && webpack --watch",
     "build-typings": "tsc -p tsconfig.typings.json && ncp dist/__typings/prefix-emitter.d.ts dist/prefix-emitter.d.ts && rimraf dist/__typings",
     "prepublish": "typings install",
     "test": "jest"
