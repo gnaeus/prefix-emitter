@@ -55,8 +55,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var fallback = __webpack_require__(1);
-	// we don't register polyfill — use local scoped fallback instead
+	/**
+	 * Copyright (c) 2016 Dmitry Panyushkin
+	 * Available under MIT license
+	 */
+	var utils_ts_1 = __webpack_require__(1);
+	var fallback = __webpack_require__(2);
+	// we don't register polyfill - we use local scoped fallback instead
 	var _Map = typeof Map !== "undefined" ? Map : fallback.Map;
 	var _Symbol = typeof Symbol !== "undefined" ? Symbol : fallback.Symbol;
 	var EmitterSubscription = (function () {
@@ -72,7 +77,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        this._disposed = true;
 	        if (this._args.length === 0) {
-	            removeItem(this._node.handlers, this._handler);
+	            utils_ts_1.removeItem(this._node.handlers, this._handler);
 	            return;
 	        }
 	        var node = this._node;
@@ -84,7 +89,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return;
 	            }
 	        }
-	        removeItem(node.handlers, this._handler);
+	        utils_ts_1.removeItem(node.handlers, this._handler);
 	        this._cleanupTrie(nodeChain, node);
 	    };
 	    EmitterSubscription.prototype._cleanupTrie = function (nodeChain, node) {
@@ -107,15 +112,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return EmitterSubscription;
 	}());
-	function removeItem(array, item) {
-	    var index = array.indexOf(item);
-	    if (index > 0) {
-	        array.splice(index, 1);
-	    }
-	    else if (index === 0) {
-	        array.shift();
-	    }
-	}
+	/**
+	 * Event Emitter which can bind handlers to events at some sequence of prefixes.
+	 * @example
+	 * const emitter = new PrefixEmitter();
+	 * const sub1 = emitter.on("/topic", "/event", (arg: any) => {
+	 *     console.log("/topic/event:", arg);
+	 * });
+	 * const sub2 = emitter.on("/topic", (event: string, arg: any) => {
+	 *     console.log("/topic:", event, arg);
+	 * });
+	 * emitter.emit("/event", "/subevent", 123);
+	 * // => "/topic/event:", 123
+	 * // => "/topic:", "/event", 123
+	 * sub1.dispose();
+	 * sub2.dispose();
+	 */
 	var PrefixEmitter = (function () {
 	    function PrefixEmitter() {
 	        this._node = { handlers: new Array() };
@@ -136,6 +148,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        node.handlers.push(handler);
 	        return new EmitterSubscription(this._node, args, handler);
 	    };
+	    /**
+	     * Subscribe to some event from this Emitter.
+	     * @param args Array: sequence of event prefixes and event handler function at last position
+	     * @returns Subscription: created subscription to event
+	     */
 	    PrefixEmitter.prototype.on = function () {
 	        var args = [];
 	        for (var _i = 0; _i < arguments.length; _i++) {
@@ -151,6 +168,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this._on(args.slice(0, lastIndex), handler);
 	    };
+	    /**
+	     * Subscribe to some event from this Emitter. Subscription will be disposed after single handler call.
+	     * @param args Array: sequence of event prefixes and event handler function at last position
+	     * @returns Subscription: created subscription to event
+	     */
 	    PrefixEmitter.prototype.once = function () {
 	        var args = [];
 	        for (var _i = 0; _i < arguments.length; _i++) {
@@ -174,6 +196,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	        return subscription;
 	    };
+	    /**
+	     * Emit one event.
+	     * @param args Array: event prefixes then event arguments
+	     */
 	    PrefixEmitter.prototype.emit = function () {
 	        var args = [];
 	        for (var _i = 0; _i < arguments.length; _i++) {
@@ -205,12 +231,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.PrefixEmitter = PrefixEmitter;
 	var _handlers = _Symbol("__prefix_emitter_handlers_");
 	var _subscriptions = _Symbol("__prefix_emitter_subscriptions_");
+	/**
+	 * Method Decorator for subscribe to Emitter at some prefix described by rest parameters.
+	 * @param emitter PrefixEmitter: some emitter
+	 * @param args Array: sequence of event prefixes
+	 * @example
+	 * class Component {
+	 *     @on(emitter, "event")
+	 *     eventHandler(arg: any) { }
+	 * }
+	 */
 	function on(emitter) {
 	    var args = [];
 	    for (var _i = 1; _i < arguments.length; _i++) {
 	        args[_i - 1] = arguments[_i];
 	    }
-	    return function (target, key, descriptor) {
+	    return function (target, key) {
 	        var handlers = target[_handlers];
 	        if (handlers === void 0) {
 	            target[_handlers] = handlers = new Array();
@@ -222,12 +258,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	}
 	exports.on = on;
+	/**
+	 * Method Decorator for subscribe to Emitter at some prefix described by rest parameters.
+	 * Subscription will be disposed after single method call.
+	 * @param emitter PrefixEmitter: some emitter
+	 * @param args Array: sequence of event prefixes
+	 * @example
+	 * class Component {
+	 *     @once(emitter, "event")
+	 *     selfDisposingHandler(arg: any) { }
+	 * }
+	 */
 	function once(emitter) {
 	    var args = [];
 	    for (var _i = 1; _i < arguments.length; _i++) {
 	        args[_i - 1] = arguments[_i];
 	    }
-	    return function (target, key, descriptor) {
+	    return function (target, key) {
 	        var handlers = target[_handlers];
 	        if (handlers === void 0) {
 	            target[_handlers] = handlers = new Array();
@@ -239,25 +286,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	}
 	exports.once = once;
-	function injectSubscriptions(target) {
-	    var handlers = target[_handlers];
-	    if (handlers !== void 0 && !target.hasOwnProperty(_subscriptions)) {
-	        target[_subscriptions] = handlers.map(function (h) {
-	            var method = target[h.key].bind(target);
-	            return h.once
-	                ? (_a = h.emitter).once.apply(_a, h.args.concat([method]))
-	                : (_b = h.emitter).on.apply(_b, h.args.concat([method]));
-	            var _a, _b;
-	        });
+	function injectSubscriptions(target, key) {
+	    if (key !== void 0) {
+	        target[key] = utils_ts_1.extendFunction(target[key], logic);
+	        return void 0;
+	    }
+	    else {
+	        return utils_ts_1.extendConstructor(target, logic);
+	    }
+	    function logic() {
+	        var _this = this;
+	        var handlers = this[_handlers];
+	        if (handlers !== void 0 && !this.hasOwnProperty(_subscriptions)) {
+	            this[_subscriptions] = handlers.map(function (h) {
+	                var method = _this[h.key].bind(_this);
+	                return h.once
+	                    ? (_a = h.emitter).once.apply(_a, h.args.concat([method]))
+	                    : (_b = h.emitter).on.apply(_b, h.args.concat([method]));
+	                var _a, _b;
+	            });
+	        }
 	    }
 	}
 	exports.injectSubscriptions = injectSubscriptions;
-	function disposeSubscriptions(target) {
-	    var subscriptions = target[_subscriptions];
-	    if (subscriptions !== void 0) {
-	        subscriptions.forEach(function (s) { s.dispose(); });
-	        delete target[_subscriptions];
-	    }
+	/**
+	 * Method Decorator for disposing all injected subscriptions during method call.
+	 * @example
+	 * class Component {
+	 *     @disposeSubscriptions
+	 *     componentWillUnmount() { }
+	 * }
+	 */
+	function disposeSubscriptions(target, key) {
+	    target[key] = utils_ts_1.extendFunction(target[key], function logic() {
+	        var subscriptions = this[_subscriptions];
+	        if (subscriptions !== void 0) {
+	            subscriptions.forEach(function (s) { s.dispose(); });
+	            delete this[_subscriptions];
+	        }
+	    });
 	}
 	exports.disposeSubscriptions = disposeSubscriptions;
 
@@ -267,7 +334,61 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	"use strict";
+	/**
+	 * Remove first occurrence of given item from the array.
+	 * @param array Array
+	 * @param item any
+	 */
+	function removeItem(array, item) {
+	    var index = array.indexOf(item);
+	    if (index > 0) {
+	        array.splice(index, 1);
+	    }
+	    else if (index === 0) {
+	        array.shift();
+	    }
+	}
+	exports.removeItem = removeItem;
+	/**
+	 * Build new constructor from given one with injected logic at the beginning of constructor call.
+	 * @param target Function
+	 * @param logic Function
+	 * @returns Function
+	 */
+	function extendConstructor(target, logic) {
+	    var constructor = extendFunction(target, logic);
+	    constructor.prototype = target.prototype;
+	    return constructor;
+	}
+	exports.extendConstructor = extendConstructor;
+	/**
+	 * Build new function from given one with injected logic at the beginning of function call.
+	 * @param target Function
+	 * @param logic Function
+	 * @returns Function
+	 */
+	function extendFunction(target, logic) {
+	    return function () {
+	        logic.apply(this, arguments);
+	        return target.apply(this, arguments);
+	    };
+	}
+	exports.extendFunction = extendFunction;
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports) {
+
+	/**
+	 * Copyright (c) 2016 Dmitry Panyushkin
+	 * Available under MIT license
+	 */
+	"use strict";
 	
+	/**
+	 * Simple fallback (not polyfill) for ES6 Map
+	 */
 	function MapFallback() {
 	    this._store = Object.create(null);
 	    this.size = 0;
@@ -295,6 +416,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	
+	/**
+	 * Fallback for ES6 Symbol
+	 */
 	function SymbolFallback(key) {
 	    if (typeof key !== "string" && typeof key !== "number") {
 	        throw new Error("Symbol not supported");

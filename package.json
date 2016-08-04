@@ -1,6 +1,6 @@
 {
   "name": "prefix-emitter",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Simple Event Emitter for ES6 and TypeScript based on Prefix Tree",
   "main": "dist/prefix-emitter.js",
   "typings": "dist/prefix-emitter.d.ts",
