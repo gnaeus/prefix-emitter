@@ -12,17 +12,13 @@ export function removeItem(array: any[], item: any): void {
     }
 }
 
-export interface Constructor extends Function {
-    new (...args: any[]): any
-}
-
 /**
  * Build new constructor from given one with injected logic at the beginning of constructor call.
  * @param target Function
  * @param logic Function
  * @returns Function
  */
-export function extendConstructor(target: Constructor, logic: Function): Constructor {
+export function extendConstructor(target: Function, logic: Function): Function {
     const constructor = extendFunction(target, logic);
     constructor.prototype = target.prototype;
     return constructor as any;

@@ -287,12 +287,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.once = once;
 	function injectSubscriptions(target, key) {
-	    if (key !== void 0) {
+	    if (target instanceof Function) {
+	        return utils_ts_1.extendConstructor(target, logic);
+	    }
+	    else if (key !== void 0) {
 	        target[key] = utils_ts_1.extendFunction(target[key], logic);
 	        return void 0;
 	    }
 	    else {
-	        return utils_ts_1.extendConstructor(target, logic);
+	        throw new Error("Decorator should be used on class or method");
 	    }
 	    function logic() {
 	        var _this = this;

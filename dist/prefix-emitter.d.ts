@@ -1,9 +1,4 @@
 /**
- * Copyright (c) 2016 Dmitry Panyushkin
- * Available under MIT license
- */
-import { Constructor } from "./utils.ts";
-/**
  * Subscription to event at some prefix.
  * Used only for unsubscribe from this event by calling `dispose()` method.
  * @example
@@ -114,7 +109,7 @@ export declare function once(emitter: PrefixEmitter, ...args: any[]): MethodDeco
  *     constructor() { }
  * }
  */
-export declare function injectSubscriptions(target: Constructor): Constructor;
+export declare function injectSubscriptions<TConstructor extends Function>(target: TConstructor): TConstructor;
 /**
  * Method Decorator for injecting subscriptions defined by `@on` and `@once` annotations during method call.
  * @example

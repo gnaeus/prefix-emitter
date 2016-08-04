@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Dmitry Panyushkin
  * Available under MIT license
  */
-import { removeItem, extendFunction, extendConstructor, Constructor } from "./utils.ts";
+import { removeItem, extendFunction, extendConstructor } from "./utils.ts";
 
 // call `require()` from webpack
 declare function require(path: string): any;
@@ -316,7 +316,7 @@ export function once(emitter: PrefixEmitter, ...args: any[]): MethodDecorator {
  *     constructor() { }
  * }
  */
-export function injectSubscriptions(target: Constructor): Constructor;
+export function injectSubscriptions<TConstructor extends Function>(target: TConstructor): TConstructor;
 
 /**
  * Method Decorator for injecting subscriptions defined by `@on` and `@once` annotations during method call.
@@ -328,12 +328,14 @@ export function injectSubscriptions(target: Constructor): Constructor;
  */
 export function injectSubscriptions(target: Object, key: string | symbol): void;
 
-export function injectSubscriptions(target: Constructor | Object, key?: string | symbol) {
-    if (key !== void 0) {
+export function injectSubscriptions(target: Function | Object, key?: string | symbol) {
+    if (target instanceof Function) {
+        return extendConstructor(target, logic);
+    } else if (key !== void 0) {
         target[key] = extendFunction(target[key], logic);
         return void 0;
     } else {
-        return extendConstructor(target as Constructor, logic);
+        throw new Error("Decorator should be used on class or method");
     }
     
     function logic() {
