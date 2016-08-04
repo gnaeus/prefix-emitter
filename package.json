@@ -11,7 +11,7 @@
     "build": "webpack & build-typings",
     "build-dev": "webpack --watch",
     "build-typings": "tsc -p tsconfig.typings.json && ncp dist/__typings/prefix-emitter.d.ts dist/prefix-emitter.d.ts && rimraf dist/__typings",
-    "postinstall": "typings install",
+    "prepublish": "typings install",
     "test": "jest"
   },
   "repository": {
