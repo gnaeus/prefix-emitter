@@ -4,9 +4,9 @@
  */
 jest.unmock("../utils.ts");
 
-import { extendFunction, extendConstructor } from "../utils.ts";
+import { decorateMethod, decorateClass } from "../utils.ts";
 
-describe("extendFunction", () => {
+describe("decorateMethod", () => {
     it("should extend target", () => {
         let targetCall = 0;
         let logicCall = 0;
@@ -14,7 +14,7 @@ describe("extendFunction", () => {
         function target() { targetCall++; }
         function logic() { logicCall++; }
         
-        const extended = extendFunction(target, logic);
+        const extended = decorateMethod(target, logic);
 
         extended();
 
@@ -22,24 +22,48 @@ describe("extendFunction", () => {
         expect(logicCall).toBe(1);
     });
 
-    it("should preserve target's name and length", () => {
+    it("should preserve target's length", () => {
         function target(a: any, b: any, c: any) { }
 
-        const extended = extendFunction(target, function () { });
+        const extended = decorateMethod(target, function () { });
 
-        expect(extended.name).toEqual(target.name);
-        expect(extended.length).toEqual(target.length);
+        expect(extended.length).toBe(target.length);
     });
 });
 
-describe("extendConstructor", () => {
-    it("should preserve target's prototype", () => {
-        class Test { }
+describe("decorateClass", () => {
+   it("should extend target", () => {
+        let targetCall = 0;
+        let logicCall = 0;
 
-        const Extended = extendConstructor(Test, function () { }) as any;
+        class Target {
+            constructor() { targetCall++; }
+        }
+        
+        function logic() { logicCall++; }
+
+        const Extended = decorateClass(Target, logic) as any;
 
         const instance = new Extended();
 
-        expect(instance instanceof Test).toBeTruthy();
+        expect(targetCall).toBe(1);
+        expect(logicCall).toBe(1);
+    });
+    
+    it("should preserve target's prototype, name, length and static fields", () => {
+        class Target {
+            constructor(a: any, b: any, c: any) { }
+
+            static Field = { foo: "bar" }
+        }
+
+        const Extended = decorateClass(Target, function () { }) as any;
+
+        const instance = new Extended(1, 2, 3);
+
+        expect(instance instanceof Target).toBeTruthy();
+        expect(Extended.name).toBe(Target.name);
+        expect(Extended.length).toBe(Target.length);
+        expect(Extended.Field).toBe(Target.Field);
     });
 });

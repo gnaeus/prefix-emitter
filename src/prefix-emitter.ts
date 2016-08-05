@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Dmitry Panyushkin
  * Available under MIT license
  */
-import { removeItem, extendFunction, extendConstructor } from "./utils.ts";
+import { removeItem, decorateMethod, decorateClass } from "./utils.ts";
 
 // call `require()` from webpack
 declare function require(path: string): any;
@@ -330,9 +330,9 @@ export function injectSubscriptions(target: Object, key: string | symbol): void;
 
 export function injectSubscriptions(target: Function | Object, key?: string | symbol) {
     if (target instanceof Function) {
-        return extendConstructor(target, logic);
+        return decorateClass(target, logic);
     } else if (key !== void 0) {
-        target[key] = extendFunction(target[key], logic);
+        target[key] = decorateMethod(target[key], logic);
         return void 0;
     } else {
         throw new Error("Decorator should be used on class or method");
@@ -360,7 +360,7 @@ export function injectSubscriptions(target: Function | Object, key?: string | sy
  * }
  */
 export function disposeSubscriptions(target: Object, key: string | symbol) {
-    target[key] = extendFunction(target[key], function logic() {
+    target[key] = decorateMethod(target[key], function logic() {
         const subscriptions: Subscription[] = this[_subscriptions];
         if (subscriptions !== void 0) {
             subscriptions.forEach(s => { s.dispose(); });

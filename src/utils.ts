@@ -14,10 +14,18 @@ export function removeItem(array: any[], item: any): void {
 
 function repeat(count: number, template: (i: number) => string, sep = ""): string {
     const arr: any[] = [];
-    for (let i = 0; i < count; ++i) {
+    for (let i = 1; i <= count; ++i) {
         arr.push(template(i));
     }
     return arr.join(sep);
+}
+
+const assign = Object.assign || function (target: Object, source: Object): void {
+    for (let k in source) {
+        if (source.hasOwnProperty(k)) {
+            target[k] = source[k];
+        }
+    }
 }
 
 /**
@@ -26,7 +34,22 @@ function repeat(count: number, template: (i: number) => string, sep = ""): strin
  * @param logic Function: injected logic
  * @returns Function
  */
-export function extendFunction(target: Function, logic: Function): Function {
+export const decorateMethod: (target: Function, logic: Function) => Function = new Function("target", "logic", `
+    switch (target.length) {${repeat(16, l => `
+        ${l < 16 ? `case ${l}`: `default`}: return function (${repeat(l, i => "v" + i, ", ")}) {
+            logic.apply(this, arguments);
+            return target.apply(this, arguments);
+        };`)}
+    }
+`) as any;
+
+/**
+ * Build new constructor from given one with injected logic at the beginning of constructor call.
+ * @param target Function: target constructor
+ * @param logic Function: injected logic
+ * @returns Function
+ */
+export function decorateClass(target: Function, logic: Function): Function {
     // unique prefix for Function constructor for
     // eliminate conflicts with `target` functions names
     const pr = "bvjxRy0LjL9D";
@@ -41,17 +64,12 @@ export function extendFunction(target: Function, logic: Function): Function {
             return ${pr}target.apply(this, arguments);
         };
     `);
-    return factory(target, logic);
-}
 
-/**
- * Build new constructor from given one with injected logic at the beginning of constructor call.
- * @param target Function: target constructor
- * @param logic Function: injected logic
- * @returns Function
- */
-export function extendConstructor(target: Function, logic: Function): Function {
-    const constructor = extendFunction(target, logic);
+    const constructor = factory(target, logic) as Function;
+
+    // preserve target's prototype and static fields
     constructor.prototype = target.prototype;
-    return constructor as any;
+    assign(constructor, target);
+
+    return constructor;
 }

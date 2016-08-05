@@ -225,7 +225,7 @@ describe("Emitter Directives", () => {
         expect(derived.onOverriddenCalls).toBe(4);
     });
 
-    it("should preserve decorated class prototype, name and constructor args length", () => {
+    it("should preserve decorated class prototype, name, length and static fields", () => {
         class PlainClass { }
 
         @injectSubscriptions
@@ -233,14 +233,18 @@ describe("Emitter Directives", () => {
             constructor(a: any, b: any, c: any) {
                 super();
             }
+
+            static Field = { foo: "bar" }
         }
 
-        expect(DecoratedClass.name).toEqual("DecoratedClass");
-        expect(DecoratedClass.length).toEqual(3);
+        expect(DecoratedClass.name).toBe("DecoratedClass");
+        expect(DecoratedClass.length).toBe(3);
 
         const instance = new DecoratedClass(1, 2, 3);
 
         expect(instance instanceof DecoratedClass).toBeTruthy();
         expect(instance instanceof PlainClass).toBeTruthy();
+
+        expect(DecoratedClass.Field).toEqual({ foo: "bar" });
     });
 });
