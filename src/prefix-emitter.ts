@@ -328,14 +328,26 @@ export function injectSubscriptions<TConstructor extends Function>(target: TCons
  */
 export function injectSubscriptions(target: Object, key: string | symbol): void;
 
+/**
+ * Utility function for injecting subscriptions defined by `@on` and `@once` annotations.
+ * @example
+ * class Component {
+ *     componentDidMount() {
+ *         injectSubscriptions(this);
+ *     }
+ * }
+ */
+export function injectSubscriptions(target: Object): void;
+
 export function injectSubscriptions(target: Function | Object, key?: string | symbol) {
-    if (target instanceof Function) {
-        return decorateClass(target, logic);
-    } else if (key !== void 0) {
+    if (key !== void 0) {
         target[key] = decorateMethod(target[key], logic);
-        return void 0;
+        return;
+    } else if (target instanceof Function) {
+        return decorateClass(target, logic);
     } else {
-        throw new Error("Decorator should be used on class or method");
+        logic.call(target);
+        return;
     }
     
     function logic() {
@@ -359,12 +371,31 @@ export function injectSubscriptions(target: Function | Object, key?: string | sy
  *     componentWillUnmount() { }
  * }
  */
-export function disposeSubscriptions(target: Object, key: string | symbol) {
-    target[key] = decorateMethod(target[key], function logic() {
+export function disposeSubscriptions(target: Object, key: string | symbol): void;
+
+/**
+ * Utility function for disposing all injected subscriptions.
+ * @example
+ * class Component {
+ *     componentWillUnmount() {
+ *         disposeSubscriptions(this);
+ *     }
+ * }
+ */
+export function disposeSubscriptions(target: Object): void;
+
+export function disposeSubscriptions(target: Object, key?: string | symbol) {
+    if (key !== void 0) {
+        target[key] = decorateMethod(target[key], logic);
+    } else {
+        logic.call(target);
+    }
+
+    function logic() {
         const subscriptions: Subscription[] = this[_subscriptions];
         if (subscriptions !== void 0) {
             subscriptions.forEach(s => { s.dispose(); });
             delete this[_subscriptions];
         }
-    });
+    }
 }

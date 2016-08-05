@@ -120,6 +120,16 @@ export declare function injectSubscriptions<TConstructor extends Function>(targe
  */
 export declare function injectSubscriptions(target: Object, key: string | symbol): void;
 /**
+ * Utility function for injecting subscriptions defined by `@on` and `@once` annotations.
+ * @example
+ * class Component {
+ *     componentDidMount() {
+ *         injectSubscriptions(this);
+ *     }
+ * }
+ */
+export declare function injectSubscriptions(target: Object): void;
+/**
  * Method Decorator for disposing all injected subscriptions during method call.
  * @example
  * class Component {
@@ -128,3 +138,13 @@ export declare function injectSubscriptions(target: Object, key: string | symbol
  * }
  */
 export declare function disposeSubscriptions(target: Object, key: string | symbol): void;
+/**
+ * Utility function for disposing all injected subscriptions.
+ * @example
+ * class Component {
+ *     componentWillUnmount() {
+ *         disposeSubscriptions(this);
+ *     }
+ * }
+ */
+export declare function disposeSubscriptions(target: Object): void;

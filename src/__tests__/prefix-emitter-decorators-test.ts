@@ -41,7 +41,7 @@ describe("Emitter Directives", () => {
         }
     }
 
-    it("should inject and dispose subscriptions", () => {
+    it("should inject and dispose subscriptions by decorators", () => {
         const component = new Component();
 
         firstEmitter.emit("init", "init-1");
@@ -86,6 +86,32 @@ describe("Emitter Directives", () => {
         firstEmitter.emit("event", "event-3");
 
         expect(component.onEventCalls).toBe(4);
+    });
+
+    class DependentComponent {
+        onEventCalls = 0;
+        
+        @on(firstEmitter, "event")
+        onEvent(msg: string) {
+            this.onEventCalls++;
+        }
+    };
+
+    it("should inject and dispose subscriptions by utility functions", () => {
+        const component = new DependentComponent();
+
+        firstEmitter.emit("event", "event-1");
+
+        injectSubscriptions(component);
+
+        firstEmitter.emit("event", "event-2");
+        firstEmitter.emit("event", "event-3");
+
+        disposeSubscriptions(component);
+
+        firstEmitter.emit("event", "event-4");
+
+        expect(component.onEventCalls).toBe(2);
     });
 
     class MountableComponent {

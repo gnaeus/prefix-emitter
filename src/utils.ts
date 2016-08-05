@@ -20,7 +20,7 @@ function repeat(count: number, template: (i: number) => string, sep = ""): strin
     return arr.join(sep);
 }
 
-const assign = Object.assign || function (target: Object, source: Object): void {
+function assign(target: Object, source: Object): void {
     for (let k in source) {
         if (source.hasOwnProperty(k)) {
             target[k] = source[k];

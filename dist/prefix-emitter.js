@@ -287,15 +287,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.once = once;
 	function injectSubscriptions(target, key) {
-	    if (target instanceof Function) {
+	    if (key !== void 0) {
+	        target[key] = utils_ts_1.decorateMethod(target[key], logic);
+	        return;
+	    }
+	    else if (target instanceof Function) {
 	        return utils_ts_1.decorateClass(target, logic);
 	    }
-	    else if (key !== void 0) {
-	        target[key] = utils_ts_1.decorateMethod(target[key], logic);
-	        return void 0;
-	    }
 	    else {
-	        throw new Error("Decorator should be used on class or method");
+	        logic.call(target);
+	        return;
 	    }
 	    function logic() {
 	        var _this = this;
@@ -312,22 +313,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	exports.injectSubscriptions = injectSubscriptions;
-	/**
-	 * Method Decorator for disposing all injected subscriptions during method call.
-	 * @example
-	 * class Component {
-	 *     @disposeSubscriptions
-	 *     componentWillUnmount() { }
-	 * }
-	 */
 	function disposeSubscriptions(target, key) {
-	    target[key] = utils_ts_1.decorateMethod(target[key], function logic() {
+	    if (key !== void 0) {
+	        target[key] = utils_ts_1.decorateMethod(target[key], logic);
+	    }
+	    else {
+	        logic.call(target);
+	    }
+	    function logic() {
 	        var subscriptions = this[_subscriptions];
 	        if (subscriptions !== void 0) {
 	            subscriptions.forEach(function (s) { s.dispose(); });
 	            delete this[_subscriptions];
 	        }
-	    });
+	    }
 	}
 	exports.disposeSubscriptions = disposeSubscriptions;
 
@@ -360,13 +359,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    return arr.join(sep);
 	}
-	var assign = Object.assign || function (target, source) {
+	function assign(target, source) {
 	    for (var k in source) {
 	        if (source.hasOwnProperty(k)) {
 	            target[k] = source[k];
 	        }
 	    }
-	};
+	}
 	/**
 	 * Build new function from given one with injected logic at the beginning of function call.
 	 * @param target Function: target function
