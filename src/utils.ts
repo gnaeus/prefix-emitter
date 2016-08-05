@@ -1,4 +1,9 @@
 ﻿/**
+ * Copyright (c) 2016 Dmitry Panyushkin
+ * Available under MIT license
+ */
+
+/**
  * Remove first occurrence of given item from the array.
  * @param array Array
  * @param item any
