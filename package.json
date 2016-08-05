@@ -5,12 +5,14 @@
   "main": "dist/prefix-emitter.js",
   "typings": "dist/prefix-emitter.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "benchmark.html"
   ],
   "scripts": {
     "build": "rimraf dist && webpack && npm run build-typings",
     "build-dev": "rimraf dist && webpack --watch",
     "build-typings": "tsc -p tsconfig.typings.json && ncp dist/__typings/prefix-emitter.d.ts dist/prefix-emitter.d.ts && rimraf dist/__typings",
+    "benchmark": "node dist/benchmarks/prefix-emitter-benchmark.js",
     "prepublish": "typings install",
     "test": "jest"
   },
@@ -31,6 +33,7 @@
   },
   "homepage": "https://github.com/gnaeus/prefix-emitter#readme",
   "devDependencies": {
+    "benchmark": "^2.1.1",
     "deepmerge": "^0.2.10",
     "jest-cli": "^14.0.1",
     "ncp": "^2.0.0",

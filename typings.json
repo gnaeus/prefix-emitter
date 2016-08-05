@@ -1,5 +1,7 @@
 {
   "globalDevDependencies": {
-    "jest": "registry:dt/jest#0.9.0+20160706021812"
+    "benchmark": "registry:dt/benchmark#1.0.0+20160317120654",
+    "jest": "registry:dt/jest#0.9.0+20160706021812",
+    "node": "registry:dt/node#6.0.0+20160802155038"
   }
 }

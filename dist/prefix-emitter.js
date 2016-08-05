@@ -335,6 +335,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports) {
 
+	/**
+	 * Copyright (c) 2016 Dmitry Panyushkin
+	 * Available under MIT license
+	 */
 	"use strict";
 	/**
 	 * Remove first occurrence of given item from the array.

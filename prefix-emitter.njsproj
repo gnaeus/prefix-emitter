@@ -20,6 +20,7 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
     <None Include=".gitignore" />
+    <None Include="benchmark.html" />
     <None Include="LICENSE" />
     <None Include="package.json" />
     <None Include="tsconfig.json" />
@@ -31,21 +32,26 @@
     <None Include="dist\**" />
     <None Include="typings\**\*.json" />
     <None Include="src\es5-fallback.js" />
+    <TypeScriptCompile Include="typings\**\*.d.ts" />
     <TypeScriptCompile Include="src\lib.es6.d.ts" />
     <TypeScriptCompile Include="src\utils.ts" />
-    <TypeScriptCompile Include="src\__tests__\utils-test.ts" />
-    <TypeScriptCompile Include="typings\**\*.d.ts" />
     <TypeScriptCompile Include="src\prefix-emitter.ts" />
+    <TypeScriptCompile Include="src\__tests__\utils-test.ts" />
     <TypeScriptCompile Include="src\__tests__\prefix-emitter-decorators-test.ts" />
     <TypeScriptCompile Include="src\__tests__\prefix-emitter-test.ts" />
+    <TypeScriptCompile Include="src\__benchmarks__\prefix-emitter-benchmark.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="dist\" />
+    <Folder Include="dist\benchmarks\" />
     <Folder Include="src\" />
+    <Folder Include="src\__benchmarks__\" />
     <Folder Include="src\__tests__\" />
     <Folder Include="typings\" />
     <Folder Include="typings\globals\" />
+    <Folder Include="typings\globals\benchmark\" />
     <Folder Include="typings\globals\jest\" />
+    <Folder Include="typings\globals\node\" />
     <Folder Include="typings\modules\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />

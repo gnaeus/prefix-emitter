@@ -1,5 +1,6 @@
-﻿const webpack       = require("webpack");
-const deepmerge     = require("deepmerge");
+﻿const path      = require("path");
+const webpack   = require("webpack");
+const deepmerge = require("deepmerge");
 
 const config = {
     entry: "./src/prefix-emitter.ts",
@@ -19,7 +20,7 @@ const config = {
         ]
     },
 
-    devtool: "source-map",
+    devtool: "#source-map",
 };
 
 const minified = deepmerge(config, {
@@ -32,4 +33,21 @@ const minified = deepmerge(config, {
     ],
 });
 
-module.exports = [config, minified];
+const benchmark = deepmerge(config, {
+    entry: "./src/__benchmarks__/prefix-emitter-benchmark.ts",
+
+    output: {
+        path: "dist/benchmarks",
+        filename: "prefix-emitter-benchmark.js",
+    },
+
+    module: {
+        noParse: [
+            /[\/\\]node_modules[\/\\]benchmark[\/\\]benchmark\.js$/
+        ],
+    },
+
+    devtool: "#inline",
+});
+
+module.exports = [config, minified, benchmark];
