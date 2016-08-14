@@ -7,7 +7,7 @@ But event listeners can be subscribed to any predefined sequence of anguments (t
 ### Key Features
  * Hierarchical event system ([topics](#prefix-emitter-topics))
  * Subscribing to and unsubscribing from events [by using Decorators](#prefix-emitter-decorators)
- * Typed events for usage with TypeScript
+ * [Typed events](#prefix-emitter-typed-events) for usage with TypeScript
  * Small size
  * Zero dependencies
  
@@ -139,7 +139,7 @@ class Component {
 }
 ```
 
-### Typed Emitters
+### <a name="prefix-emitter-typed-events"></a>Typed Emitters
 For TypeScript there are three predefined generic Event Emitter interfaces:
 
 #### VoidEmitter
