@@ -2,8 +2,16 @@
 __Simple Event Emitter for ES6 and TypeScript based on Prefix Tree__
 
 Prefix Emitter is a small library (1.7KB min+gz) with functionality like Node's Event Emitter.
-But event listeners can be subscribed to any predefined sequence of anguments instead of single event name.
-See example below:
+But event listeners can be subscribed to any predefined sequence of anguments (topic) instead of single event name.
+
+### Key Features
+ * Hierarchical event system ([topics](#prefix-emitter-topics))
+ * Subscribing to and unsubscribing from events [by using Decorators](#prefix-emitter-decorators)
+ * Typed events for usage with TypeScript
+ * Small size
+ * Zero dependencies
+ 
+### <a name="prefix-emitter-topics"></a>Example
 ```js
 import { PrefixEmitter } from "prefix-emitter";
 
@@ -80,7 +88,7 @@ emitter.emit("event", "foo"); // ➜ [subscription is dispoised], "foo"
 emitter.emit("event", "bar"); // ➜
 ```
 
-### Decorators
+### <a name="prefix-emitter-decorators"></a>Decorators
 Methods of some class can be marked as event listeners by using `@on` and `@once` Method Decprators.
 Then subscriptions will be created by `@injectSubscriptions` and automatically disposed by `@disposeSubscriptions` decorators.
 See example:
