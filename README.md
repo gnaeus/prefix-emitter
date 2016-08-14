@@ -46,7 +46,7 @@ Otherwise event prefix could be an object (if you need such strange case).
 ---
 ## Documentation
 
-### Subscrbing to events
+### Basic usage
 
 We can choose any sequence of arguments (even empty) and subscribe event handler to it:
 #### PrefixEmitter.on()
@@ -80,8 +80,59 @@ emitter.emit("event", "foo"); // ➜ [subscription is dispoised], "foo"
 emitter.emit("event", "bar"); // ➜
 ```
 
+### Decorators
+Methods of some class can be marked as event listeners by using `@on` and `@once` Method Decprators.
+Then subscriptions will be created by `@injectSubscriptions` and automatically disposed by `@disposeSubscriptions` decorators.
+See example:
+```js
+import { on, once, injectSubscriptions, disposeSubscriptions, PrefixEmitter } from "prefix-emitter";
+
+const emitter = new PrefixEmitter();
+
+class Component {
+  @injectSubscriptions
+  componentDidMount() { }
+  
+  @once(emitter, "first")
+  onFirstEvent(arg) { }
+  
+  @once(emitter, "second")
+  onSecondEvent(arg) { }
+  
+  @disposeSubscriptions
+  componentWillUnmount() { }
+}
+```
+
+Subscriptions can be injected and disposed by Method Decorators (like in example above)
+or manually by using `injectSubscriptions()` `disposeSubscriptions()` as functions:
+```js
+class Component {
+  componentDidMount() {
+    injectSubscriptions(this);
+  }
+  
+  componentWillUnmount() {
+    disposeSubscriptions(this);
+  }
+}
+```
+
+Also subscriptions can be injected by `@injectSubscriptions` as Class Decorator during constructor call:
+```js
+@injectSubscriptions
+class Component {
+  constructor() {
+    // some stuff
+  }
+  
+  @disposeSubscriptions
+  dispose() { }
+}
+```
+
 ### Typed Emitters
-For TypeScript there are three predefined generic Event Emitter interfaces
+For TypeScript there are three predefined generic Event Emitter interfaces:
 
 #### VoidEmitter
 Emitter without any arguments.
@@ -109,6 +160,28 @@ const emitter: DoubleEmitter<sring, number> = new PrefixEmitter();
 const sub2 = emitter.on((event: string, arg: number) => { console.log(event, arg); });
 const sub2 = emitter.on("event", (arg: number) => { console.log("[event]", arg); });
 const sub3 = emitter.on("event", 123, () => { console.log("[event, 123]"); });
+```
+
+### Tips
+PrefixEmitter calls all listeners synchronously.
+
+If you want define asynchronous listener, you could wrap its body to `setImmediate()` or some `asap()` function.
+```js
+emitter.on("event", (arg) => {
+  setImmediate(() => { 
+    // event listener body
+  });
+});
+```
+
+If you want emit some event asynchronously, you can do such thing:
+```js
+let a = 1, b = 2, c = 3;
+// store argument values
+const args = [a, b, c];
+setImmediate(() => { emitter.emit(...args); });
+// arguments can be changed like after synchronous `emit`
+a = 4; b = 5;
 ```
 
 ---
