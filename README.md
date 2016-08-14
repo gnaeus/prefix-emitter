@@ -196,3 +196,7 @@ a = 4; b = 5;
 ### TypeScript Definitions
 TypeScript definitions are packaged together with `js` files in `/dist` folder.
 And it could be installed automatically with NPM package using [typings](https://www.npmjs.com/package/typings) utility.
+
+### Benchmarks
+To run benchmarks please type `npm run benchmarks` in console or open `./benchmark.html` in browser.
+
