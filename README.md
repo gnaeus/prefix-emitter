@@ -6,7 +6,7 @@ Prefix Emitter is a small library (1.7KB min+gz) with functionality like Node's 
 But event listeners can be subscribed to any predefined sequence of anguments (topic) instead of single event name.
 
 ### Key Features
- * Hierarchical event system ([topics](#prefix-emitter-topics))
+ * [Hierarchical event system](#prefix-emitter-topics) (topics)
  * Subscribing to and unsubscribing from events [by using Decorators](#prefix-emitter-decorators)
  * [Typed events](#prefix-emitter-typed-events) for usage with TypeScript
  * Small size
@@ -150,6 +150,7 @@ Can simply trigger subscriptions.
 import { VoidEmitter, PrefixEmitter } from "prefix-emitter";
 
 const emitter: VoidEmitter = new PrefixEmitter();
+
 const sub = emitter.on(() => { console.log("fired!"); });
 ```
 
@@ -158,7 +159,8 @@ Emitter with one argument (or event).
 ```ts
 import { SingleEmitter, PrefixEmitter } from "prefix-emitter";
 
-const emitter: SingleEmitter<sring> = new PrefixEmitter();
+const emitter: SingleEmitter<string> = new PrefixEmitter();
+
 const sub1 = emitter.on("event", () => { console.log("event fired!"); });
 const sub2 = emitter.on((arg: string) => { console.log(arg + "fired!"); });
 ```
@@ -168,7 +170,8 @@ Emitter with two arguments (or prefixes).
 ```ts
 import { DoubleEmitter, PrefixEmitter } from "prefix-emitter";
 
-const emitter: DoubleEmitter<sring, number> = new PrefixEmitter();
+const emitter: DoubleEmitter<string, number> = new PrefixEmitter();
+
 const sub2 = emitter.on((event: string, arg: number) => { console.log(event, arg); });
 const sub2 = emitter.on("event", (arg: number) => { console.log("[event]", arg); });
 const sub3 = emitter.on("event", 123, () => { console.log("[event, 123]"); });
