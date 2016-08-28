@@ -1,6 +1,9 @@
-# Prefix Emitter [![Build Status](https://travis-ci.org/gnaeus/prefix-emitter.svg?branch=master)](https://travis-ci.org/gnaeus/prefix-emitter) [![npm version](https://img.shields.io/npm/v/prefix-emitter.svg?style=flat)](https://www.npmjs.com/package/prefix-emitter)
-
+# Prefix Emitter
 __Simple Event Emitter for ES6 and TypeScript based on Prefix Tree__
+
+[![Build Status](https://travis-ci.org/gnaeus/prefix-emitter.svg?branch=master)](https://travis-ci.org/gnaeus/prefix-emitter)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/gnaeus/knockout-decorators/master/LICENSE)
+[![npm version](https://img.shields.io/npm/v/prefix-emitter.svg?style=flat)](https://www.npmjs.com/package/prefix-emitter)
 
 Prefix Emitter is a small library (1.7KB min+gz) with functionality like Node's Event Emitter.
 But event listeners can be subscribed to any predefined sequence of anguments (topic) instead of single event name.
