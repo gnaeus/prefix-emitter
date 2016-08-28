@@ -1,4 +1,4 @@
-# Prefix Emitter [![Build Status](https://travis-ci.org/gnaeus/prefix-emitter.svg?branch=master)](https://travis-ci.org/gnaeus/prefix-emitter)
+# Prefix Emitter [![Build Status](https://travis-ci.org/gnaeus/prefix-emitter.svg?branch=master)](https://travis-ci.org/gnaeus/prefix-emitter) [![npm version](https://img.shields.io/npm/v/prefix-emitter.svg?style=flat)](https://www.npmjs.com/package/prefix-emitter)
 
 __Simple Event Emitter for ES6 and TypeScript based on Prefix Tree__
 
@@ -146,7 +146,7 @@ For TypeScript there are three predefined generic Event Emitter interfaces:
 #### VoidEmitter
 Emitter without any arguments.
 Can simply trigger subscriptions.
-```ts
+```js
 import { VoidEmitter, PrefixEmitter } from "prefix-emitter";
 
 const emitter: VoidEmitter = new PrefixEmitter();
@@ -156,7 +156,7 @@ const sub = emitter.on(() => { console.log("fired!"); });
 
 #### SingleEmitter
 Emitter with one argument (or event).
-```ts
+```js
 import { SingleEmitter, PrefixEmitter } from "prefix-emitter";
 
 const emitter: SingleEmitter<string> = new PrefixEmitter();
@@ -167,7 +167,7 @@ const sub2 = emitter.on((arg: string) => { console.log(arg + "fired!"); });
 
 #### DoubleEmitter
 Emitter with two arguments (or prefixes).
-```ts
+```js
 import { DoubleEmitter, PrefixEmitter } from "prefix-emitter";
 
 const emitter: DoubleEmitter<string, number> = new PrefixEmitter();
