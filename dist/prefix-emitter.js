@@ -286,8 +286,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	}
 	exports.once = once;
-	function injectSubscriptions(target, key) {
-	    if (key !== void 0) {
+	function injectSubscriptions(target, key, descriptor) {
+	    if (arguments.length === 3) {
+	        descriptor = descriptor || Object.getOwnPropertyDescriptor(target, key);
+	        descriptor.value = utils_ts_1.decorateMethod(descriptor.value, logic);
+	        return descriptor;
+	    }
+	    else if (arguments.length === 2) {
 	        target[key] = utils_ts_1.decorateMethod(target[key], logic);
 	        return;
 	    }
@@ -313,8 +318,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	exports.injectSubscriptions = injectSubscriptions;
-	function disposeSubscriptions(target, key) {
-	    if (key !== void 0) {
+	function disposeSubscriptions(target, key, descriptor) {
+	    if (arguments.length === 3) {
+	        descriptor = descriptor || Object.getOwnPropertyDescriptor(target, key);
+	        descriptor.value = utils_ts_1.decorateMethod(descriptor.value, logic);
+	        return descriptor;
+	    }
+	    else if (arguments.length === 2) {
 	        target[key] = utils_ts_1.decorateMethod(target[key], logic);
 	    }
 	    else {

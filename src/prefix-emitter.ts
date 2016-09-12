@@ -339,13 +339,20 @@ export function injectSubscriptions(target: Object, key: string | symbol): void;
  */
 export function injectSubscriptions(target: Object): void;
 
-export function injectSubscriptions(target: Function | Object, key?: string | symbol) {
-    if (key !== void 0) {
+export function injectSubscriptions(
+    target: Function | Object, key?: string | symbol,
+    descriptor?: TypedPropertyDescriptor<Function>
+): TypedPropertyDescriptor<Function> | Function | void {
+    if (arguments.length === 3) { // ES5+ method decorator
+        descriptor = descriptor || Object.getOwnPropertyDescriptor(target, key);
+        descriptor.value = decorateMethod(descriptor.value, logic);
+        return descriptor;
+    } else if (arguments.length === 2) { // ES3 method decorator
         target[key] = decorateMethod(target[key], logic);
         return;
-    } else if (target instanceof Function) {
+    } else if (target instanceof Function) { // constructor decorator
         return decorateClass(target, logic);
-    } else {
+    } else { // explicit invocation
         logic.call(target);
         return;
     }
@@ -384,10 +391,17 @@ export function disposeSubscriptions(target: Object, key: string | symbol): void
  */
 export function disposeSubscriptions(target: Object): void;
 
-export function disposeSubscriptions(target: Object, key?: string | symbol) {
-    if (key !== void 0) {
+export function disposeSubscriptions(
+    target: Object, key?: string | symbol,
+    descriptor?: TypedPropertyDescriptor<Function>
+): TypedPropertyDescriptor<Function> | Function | void {
+    if (arguments.length === 3) { // ES5+ method decorator
+        descriptor = descriptor || Object.getOwnPropertyDescriptor(target, key);
+        descriptor.value = decorateMethod(descriptor.value, logic);
+        return descriptor;
+    } else if (arguments.length === 2) { // ES3 method decorator
         target[key] = decorateMethod(target[key], logic);
-    } else {
+    } else { // explicit invocation
         logic.call(target);
     }
 

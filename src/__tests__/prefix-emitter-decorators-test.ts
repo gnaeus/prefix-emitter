@@ -273,4 +273,59 @@ describe("Emitter Directives", () => {
 
         expect(DecoratedClass.Field).toEqual({ foo: "bar" });
     });
+
+    it("should be composable with other decorators", () => {
+        let log: string[] = [];
+        function logDecorator(target: Object, key: string, descriptor: PropertyDescriptor) {
+            if (arguments.length === 2) {
+                let old = target[key] as Function;
+                target[key] = function () {
+                    log.push(key);
+                    return old.apply(this, arguments);
+                };
+            } else {
+                descriptor = descriptor || Object.getOwnPropertyDescriptor(target, key);
+                let old = descriptor.value as Function;
+                descriptor.value = function () {
+                    log.push(key);
+                    return old.apply(this, arguments);
+                };
+            }
+            return descriptor;
+        }
+
+        class MountableComponent {
+            onEventCalls = 0;
+
+            @injectSubscriptions
+            @logDecorator
+            mount() { }
+
+            @disposeSubscriptions
+            @logDecorator
+            unmount() { }
+
+            @on(firstEmitter, "event")
+            @logDecorator
+            onEvent(msg: string) {
+                this.onEventCalls++;
+            }
+        }
+
+        const component = new MountableComponent();
+
+        firstEmitter.emit("event", "event-1");
+
+        component.mount();
+
+        firstEmitter.emit("event", "event-2");
+        firstEmitter.emit("event", "event-3");
+
+        component.unmount();
+
+        firstEmitter.emit("event", "event-4");
+
+        expect(component.onEventCalls).toBe(2);
+        expect(log).toEqual(["mount", "onEvent", "onEvent", "unmount"]);
+    });
 });
