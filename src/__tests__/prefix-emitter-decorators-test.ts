@@ -19,7 +19,7 @@ describe("Emitter Directives", () => {
         onInitCalls = 0;
         onEventCalls = 0;
         onBothCalls = 0;
-        
+
         @disposeSubscriptions
         dispose() { }
 
@@ -90,7 +90,7 @@ describe("Emitter Directives", () => {
 
     class DependentComponent {
         onEventCalls = 0;
-        
+
         @on(firstEmitter, "event")
         onEvent(msg: string) {
             this.onEventCalls++;
@@ -116,7 +116,7 @@ describe("Emitter Directives", () => {
 
     class MountableComponent {
         onEventCalls = 0;
-        
+
         @injectSubscriptions
         mount() { }
 
@@ -152,7 +152,7 @@ describe("Emitter Directives", () => {
 
     it("should inject subscriptions by multiple Class Decorators like by single decorator", () => {
         const component = new IdempotentComponent();
-        
+
         firstEmitter.emit("event", "event-1");
         firstEmitter.emit("event", "event-2");
 
@@ -260,7 +260,7 @@ describe("Emitter Directives", () => {
                 super();
             }
 
-            static Field = { foo: "bar" }
+            static Field = { foo: "bar" };
         }
 
         expect(DecoratedClass.name).toBe("DecoratedClass");

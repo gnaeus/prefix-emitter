@@ -41,7 +41,7 @@ function assign(target: Object, source: Object): void {
  */
 export const decorateMethod: (target: Function, logic: Function) => Function = new Function("target", "logic", `
     switch (target.length) {${repeat(16, l => `
-        ${l < 16 ? `case ${l}`: `default`}: return function (${repeat(l, i => "v" + i, ", ")}) {
+        ${l < 16 ? `case ${l}` : `default`}: return function (${repeat(l, i => "v" + i, ", ")}) {
             logic.apply(this, arguments);
             return target.apply(this, arguments);
         };`)}

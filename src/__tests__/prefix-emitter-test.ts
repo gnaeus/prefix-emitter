@@ -63,7 +63,7 @@ describe("Prefix Emitter", () => {
             expect(arg3).toBe("arg3");
             expect(arg4).toBe("arg4");
         });
-        
+
         emitter.once("arg1", "arg2", (arg3: any, arg4: any) => {
             handlerCalls++;
             expect(arg3).toBe("arg3");
@@ -74,7 +74,7 @@ describe("Prefix Emitter", () => {
             handlerCalls++;
             expect(arg4).toBe("arg4");
         });
-        
+
         emitter.emit("arg1", "arg2", "arg3", "arg4");
 
         expect(handlerCalls).toBe(4);

@@ -13,8 +13,8 @@ const _Map: MapConstructor = typeof Map !== "undefined" ? Map : fallback.Map;
 const _Symbol: SymbolConstructor = typeof Symbol !== "undefined" ? Symbol : fallback.Symbol;
 
 interface TrieNode {
-    handlers: Function[],
-    children?: Map<any, TrieNode>,
+    handlers: Function[];
+    children?: Map<any, TrieNode>;
 }
 
 /**
@@ -25,7 +25,7 @@ interface TrieNode {
  * subscription.dispose(); // event handler will be removed
  */
 export interface Subscription {
-    dispose(): void,
+    dispose(): void;
 }
 
 class EmitterSubscription implements Subscription {
@@ -51,7 +51,7 @@ class EmitterSubscription implements Subscription {
             removeItem(this._node.handlers, this._handler);
             return;
         }
-        
+
         let node = this._node;
         const nodeChain = new Array<TrieNode>();
         for (let i = 0; i < this._args.length; ++i) {
@@ -150,7 +150,7 @@ export class PrefixEmitter implements VoidEmitter, SingleEmitter<any>, DoubleEmi
     constructor() {
         this._node = { handlers: new Array<Function>() };
     }
-    
+
     private _on(args: any[], handler: Function): Subscription {
         let node = this._node;
         for (let i = 0; i < args.length; ++i) {
@@ -175,11 +175,11 @@ export class PrefixEmitter implements VoidEmitter, SingleEmitter<any>, DoubleEmi
      */
     on(...args: Array<any | Function>): Subscription {
         const lastIndex = arguments.length - 1;
-        if(lastIndex < 0) {
+        if (lastIndex < 0) {
             throw new Error("last argument is not a function");
         }
         const handler = args[lastIndex] as Function;
-        if(typeof handler !== "function") {
+        if (typeof handler !== "function") {
             throw new Error("last argument is not a function");
         }
         return this._on(args.slice(0, lastIndex), handler);
@@ -235,10 +235,10 @@ export class PrefixEmitter implements VoidEmitter, SingleEmitter<any>, DoubleEmi
 }
 
 interface Handler {
-    emitter: PrefixEmitter,
-    args: any[],
-    key: string | symbol,
-    once?: boolean,
+    emitter: PrefixEmitter;
+    args: any[];
+    key: string | symbol;
+    once?: boolean;
 }
 
 const _handlers = _Symbol("__prefix_emitter_handlers_");
@@ -272,7 +272,7 @@ export function on(emitter: PrefixEmitter, ...args: any[]): MethodDecorator {
             target[_handlers] = handlers = [...handlers];
         }
         handlers.push({ emitter, args, key });
-    }
+    };
 }
 
 
@@ -305,7 +305,7 @@ export function once(emitter: PrefixEmitter, ...args: any[]): MethodDecorator {
             target[_handlers] = handlers = [...handlers];
         }
         handlers.push({ emitter, args, key, once: true });
-    }
+    };
 }
 
 /**
@@ -349,7 +349,7 @@ export function injectSubscriptions(target: Function | Object, key?: string | sy
         logic.call(target);
         return;
     }
-    
+
     function logic() {
         const handlers: Handler[] = this[_handlers];
         if (handlers !== void 0 && !this.hasOwnProperty(_subscriptions)) {

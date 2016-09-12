@@ -13,7 +13,7 @@ describe("decorateMethod", () => {
 
         function target() { targetCall++; }
         function logic() { logicCall++; }
-        
+
         const extended = decorateMethod(target, logic);
 
         extended();
@@ -39,7 +39,7 @@ describe("decorateClass", () => {
         class Target {
             constructor() { targetCall++; }
         }
-        
+
         function logic() { logicCall++; }
 
         const Extended = decorateClass(Target, logic) as any;
@@ -49,12 +49,12 @@ describe("decorateClass", () => {
         expect(targetCall).toBe(1);
         expect(logicCall).toBe(1);
     });
-    
+
     it("should preserve target's prototype, name, length and static fields", () => {
         class Target {
             constructor(a: any, b: any, c: any) { }
 
-            static Field = { foo: "bar" }
+            static Field = { foo: "bar" };
         }
 
         const Extended = decorateClass(Target, function () { }) as any;
