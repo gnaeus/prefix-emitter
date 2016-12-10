@@ -2,12 +2,12 @@
  * Copyright (c) 2016 Dmitry Panyushkin
  * Available under MIT license
  */
-jest.unmock("../utils.ts");
-jest.unmock("../prefix-emitter.ts");
-jest.unmock("../es5-fallback.js");
+jest.unmock("../utils");
+jest.unmock("../prefix-emitter");
+jest.unmock("../es5-fallback");
 
-import { PrefixEmitter, VoidEmitter, DoubleEmitter } from "../prefix-emitter.ts";
-import { on, once, injectSubscriptions, disposeSubscriptions } from "../prefix-emitter.ts";
+import { PrefixEmitter, VoidEmitter, DoubleEmitter } from "../prefix-emitter";
+import { on, once, injectSubscriptions, disposeSubscriptions } from "../prefix-emitter";
 
 const firstEmitter: DoubleEmitter<string, string> = new PrefixEmitter();
 const secondEmitter: VoidEmitter = new PrefixEmitter();

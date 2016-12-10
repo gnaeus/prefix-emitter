@@ -1,15 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
-    "declaration": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": false,
-    "noImplicitAny" : true,
-    "noImplicitReturns": true,
-    "preserveConstEnums": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "outDir": "dist/__typings"
+    "declaration": true,
+    "lib": [
+      "dom", "es5", "es6"
+    ],
+    "target": "es5",
+    "outDir": "__temp"
   },
   "files": [
     "src/prefix-emitter.ts"

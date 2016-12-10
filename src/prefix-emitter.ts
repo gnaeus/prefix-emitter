@@ -2,15 +2,12 @@
  * Copyright (c) 2016 Dmitry Panyushkin
  * Available under MIT license
  */
-import { removeItem, decorateMethod, decorateClass } from "./utils.ts";
-
-// call `require()` from webpack
-declare function require(path: string): any;
-const fallback = require("./es5-fallback.js");
+import { removeItem, decorateMethod, decorateClass } from "./utils";
+import { MapFallback, SymbolFallback } from "./es5-fallback";
 
 // we don't register polyfill - we use local scoped fallback instead
-const _Map: MapConstructor = typeof Map !== "undefined" ? Map : fallback.Map;
-const _Symbol: SymbolConstructor = typeof Symbol !== "undefined" ? Symbol : fallback.Symbol;
+const _Map: MapConstructor = typeof Map !== "undefined" ? Map : MapFallback as any;
+const _Symbol: SymbolConstructor = typeof Symbol !== "undefined" ? Symbol : SymbolFallback as any;
 
 interface TrieNode {
     handlers: Function[];

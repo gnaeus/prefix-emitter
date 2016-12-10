@@ -1,15 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "noLib": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": false,
-    "noImplicitAny" : true,
-    "noImplicitReturns": true,
-    "preserveConstEnums": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "sourceMap": true
+    "lib": [
+      "dom", "es5", "es6"
+    ],
+    "target": "es5"
   },
   "exclude": [
     "node_modules",

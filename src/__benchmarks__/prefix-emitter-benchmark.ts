@@ -1,7 +1,6 @@
-﻿import "lodash";
-import * as Benchmark from "benchmark";
+﻿import * as Benchmark from "benchmark";
 import { EventEmitter } from "events";
-import { PrefixEmitter } from "../prefix-emitter.ts";
+import { PrefixEmitter } from "../prefix-emitter";
 
 let log: (msg: string) => void;
 
@@ -11,7 +10,6 @@ if (typeof window !== "undefined") {
         el.textContent  = msg;
         document.body.appendChild(el);
     }
-    window['Benchmark'] = Benchmark;
 } else {
     log = console.log.bind(console);
 }

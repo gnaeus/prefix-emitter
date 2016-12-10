@@ -148,3 +148,4 @@ export declare function disposeSubscriptions(target: Object, key: string | symbo
  * }
  */
 export declare function disposeSubscriptions(target: Object): void;
+export as namespace PrefixEmitter;

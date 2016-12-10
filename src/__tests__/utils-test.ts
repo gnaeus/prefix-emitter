@@ -2,9 +2,9 @@
  * Copyright (c) 2016 Dmitry Panyushkin
  * Available under MIT license
  */
-jest.unmock("../utils.ts");
+jest.unmock("../utils");
 
-import { decorateMethod, decorateClass } from "../utils.ts";
+import { decorateMethod, decorateClass } from "../utils";
 
 describe("decorateMethod", () => {
     it("should extend target", () => {
