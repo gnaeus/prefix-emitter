@@ -17,7 +17,7 @@ export function removeItem(array: any[], item: any): void {
     }
 }
 
-function repeat(count: number, template: (i: number) => string, sep = ""): string {
+export function repeat(count: number, template: (i: number) => string, sep = ""): string {
     const arr: any[] = [];
     for (let i = 1; i <= count; ++i) {
         arr.push(template(i));
@@ -25,7 +25,7 @@ function repeat(count: number, template: (i: number) => string, sep = ""): strin
     return arr.join(sep);
 }
 
-function assign(target: Object, source: Object): void {
+export function assign(target: Object, source: Object): void {
     for (let k in source) {
         if (source.hasOwnProperty(k)) {
             target[k] = source[k];

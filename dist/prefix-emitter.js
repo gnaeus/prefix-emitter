@@ -46,28 +46,13 @@ function assign(target, source) {
  * @param logic Function: injected logic
  * @returns Function
  */
-var decorateMethod = new Function("target", "logic", "\n    switch (target.length) {" + repeat(16, function (l) { return "\n        " + (l < 16 ? "case " + l : "default") + ": return function (" + repeat(l, function (i) { return "v" + i; }, ", ") + ") {\n            logic.apply(this, arguments);\n            return target.apply(this, arguments);\n        };"; }) + "\n    }\n");
+
 /**
  * Build new constructor from given one with injected logic at the beginning of constructor call.
  * @param target Function: target constructor
  * @param logic Function: injected logic
  * @returns Function
  */
-function decorateClass(target, logic) {
-    // unique prefix for Function constructor for
-    // eliminate conflicts with `target` functions names
-    var pr = "bvjxRy0LjL9D";
-    // Code generation is used to preserve target's `.name` and `.length`
-    // It is about 30x slower than simple funciton wrapping
-    // But it is slill less than 5 microseconds per call
-    // So if you have 200 decorated classes it took less then 1ms
-    var factory = new Function(pr + "target", pr + "logic", "\n        return function " + target.name + "(" + repeat(target.length, function (i) { return "v" + i; }, ", ") + ") {\n            " + pr + "logic.apply(this, arguments);\n            return " + pr + "target.apply(this, arguments);\n        };\n    ");
-    var constructor = factory(target, logic);
-    // preserve target's prototype and static fields
-    constructor.prototype = target.prototype;
-    assign(constructor, target);
-    return constructor;
-}
 
 /**
 * Copyright (c) 2016 Dmitry Panyushkin
@@ -166,6 +151,10 @@ var EmitterSubscription = (function () {
     };
     return EmitterSubscription;
 }());
+/**
+ * Alias for importing PrefixEmitter from global scope
+ */
+var Emitter = PrefixEmitter;
 /**
  * Event Emitter which can bind handlers to events at some sequence of prefixes.
  * @example
@@ -337,57 +326,60 @@ function once(emitter) {
         handlers.push({ emitter: emitter, args: args, key: key, once: true });
     };
 }
-function injectSubscriptions(target, key, descriptor) {
-    if (arguments.length === 3) {
-        descriptor = descriptor || Object.getOwnPropertyDescriptor(target, key);
-        descriptor.value = decorateMethod(descriptor.value, logic);
-        return descriptor;
+/**
+ * Utility function for injecting subscriptions defined by `@on` and `@once` annotations.
+ * @example
+ * class Component {
+ *     componentDidMount() {
+ *         injectSubscriptions(this);
+ *     }
+ * }
+ * class Service {
+ *     constructor() {
+ *         injectSubscriptions(this, [
+ *             Emitter.on("firstEvent", this.onFirstEvent.bind(this)),
+ *         ]);
+ *     }
+ * }
+ */
+function injectSubscriptions(target, subscriptions) {
+    var handlers = target[_handlers];
+    if (handlers !== void 0 && !target.hasOwnProperty(_subscriptions)) {
+        target[_subscriptions] = handlers.map(function (h) {
+            var method = target[h.key].bind(target);
+            return h.once
+                ? (_a = h.emitter).once.apply(_a, h.args.concat([method])) : (_b = h.emitter).on.apply(_b, h.args.concat([method]));
+            var _a, _b;
+        });
     }
-    else if (arguments.length === 2) {
-        target[key] = decorateMethod(target[key], logic);
-        return;
-    }
-    else if (target instanceof Function) {
-        return decorateClass(target, logic);
-    }
-    else {
-        logic.call(target);
-        return;
-    }
-    function logic() {
-        var _this = this;
-        var handlers = this[_handlers];
-        if (handlers !== void 0 && !this.hasOwnProperty(_subscriptions)) {
-            this[_subscriptions] = handlers.map(function (h) {
-                var method = _this[h.key].bind(_this);
-                return h.once
-                    ? (_a = h.emitter).once.apply(_a, h.args.concat([method])) : (_b = h.emitter).on.apply(_b, h.args.concat([method]));
-                var _a, _b;
-            });
+    if (subscriptions !== void 0) {
+        if (!target.hasOwnProperty(_subscriptions)) {
+            target[_subscriptions] = subscriptions;
+        }
+        else {
+            (_a = target[_subscriptions]).push.apply(_a, subscriptions);
         }
     }
+    var _a;
 }
-function disposeSubscriptions(target, key, descriptor) {
-    if (arguments.length === 3) {
-        descriptor = descriptor || Object.getOwnPropertyDescriptor(target, key);
-        descriptor.value = decorateMethod(descriptor.value, logic);
-        return descriptor;
-    }
-    else if (arguments.length === 2) {
-        target[key] = decorateMethod(target[key], logic);
-    }
-    else {
-        logic.call(target);
-    }
-    function logic() {
-        var subscriptions = this[_subscriptions];
-        if (subscriptions !== void 0) {
-            subscriptions.forEach(function (s) { s.dispose(); });
-            delete this[_subscriptions];
-        }
+/**
+ * Utility function for disposing all injected subscriptions.
+ * @example
+ * class Component {
+ *     componentWillUnmount() {
+ *         disposeSubscriptions(this);
+ *     }
+ * }
+ */
+function disposeSubscriptions(target) {
+    var subscriptions = target[_subscriptions];
+    if (subscriptions !== void 0) {
+        subscriptions.forEach(function (s) { s.dispose(); });
+        delete target[_subscriptions];
     }
 }
 
+exports.Emitter = Emitter;
 exports.on = on;
 exports.once = once;
 exports.injectSubscriptions = injectSubscriptions;

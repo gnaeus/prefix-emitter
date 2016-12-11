@@ -50,6 +50,10 @@ export interface DoubleEmitter<TEvent, TArg> {
     emit(event: TEvent, arg: TArg): void;
 }
 /**
+ * Alias for importing PrefixEmitter from global scope
+ */
+export declare const Emitter: typeof PrefixEmitter;
+/**
  * Event Emitter which can bind handlers to events at some sequence of prefixes.
  * @example
  * const emitter = new PrefixEmitter();
@@ -102,24 +106,6 @@ export declare function once<TEvent, TArg>(emitter: DoubleEmitter<TEvent, TArg>,
 export declare function once<TEvent, TArg>(emitter: DoubleEmitter<TEvent, TArg>, event: TEvent, arg: TArg): MethodDecorator;
 export declare function once(emitter: PrefixEmitter, ...args: any[]): MethodDecorator;
 /**
- * Class Decorator for injecting subscriptions defined by `@on` and `@once` annotations during constructor call.
- * @example
- * @injectSubscriptions
- * class Component {
- *     constructor() { }
- * }
- */
-export declare function injectSubscriptions<TConstructor extends Function>(target: TConstructor): TConstructor;
-/**
- * Method Decorator for injecting subscriptions defined by `@on` and `@once` annotations during method call.
- * @example
- * class Component {
- *     @injectSubscriptions
- *     componentDidMount() { }
- * }
- */
-export declare function injectSubscriptions(target: Object, key: string | symbol): void;
-/**
  * Utility function for injecting subscriptions defined by `@on` and `@once` annotations.
  * @example
  * class Component {
@@ -127,17 +113,15 @@ export declare function injectSubscriptions(target: Object, key: string | symbol
  *         injectSubscriptions(this);
  *     }
  * }
- */
-export declare function injectSubscriptions(target: Object): void;
-/**
- * Method Decorator for disposing all injected subscriptions during method call.
- * @example
- * class Component {
- *     @disposeSubscriptions
- *     componentWillUnmount() { }
+ * class Service {
+ *     constructor() {
+ *         injectSubscriptions(this, [
+ *             Emitter.on("firstEvent", this.onFirstEvent.bind(this)),
+ *         ]);
+ *     }
  * }
  */
-export declare function disposeSubscriptions(target: Object, key: string | symbol): void;
+export declare function injectSubscriptions(target: Object, subscriptions?: Subscription[]): void;
 /**
  * Utility function for disposing all injected subscriptions.
  * @example

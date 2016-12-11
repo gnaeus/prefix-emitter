@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Dmitry Panyushkin
  * Available under MIT license
  */
-import { removeItem, decorateMethod, decorateClass } from "./utils";
+import { removeItem } from "./utils";
 import { MapFallback, SymbolFallback } from "./es5-fallback";
 
 // we don't register polyfill - we use local scoped fallback instead
@@ -124,6 +124,11 @@ export interface DoubleEmitter<TEvent, TArg> {
     once(event: TEvent, arg: TArg, handler: () => void): Subscription;
     emit(event: TEvent, arg: TArg): void;
 }
+
+/**
+ * Alias for importing PrefixEmitter from global scope
+ */
+export const Emitter = PrefixEmitter;
 
 /**
  * Event Emitter which can bind handlers to events at some sequence of prefixes.
@@ -306,26 +311,6 @@ export function once(emitter: PrefixEmitter, ...args: any[]): MethodDecorator {
 }
 
 /**
- * Class Decorator for injecting subscriptions defined by `@on` and `@once` annotations during constructor call.
- * @example
- * @injectSubscriptions
- * class Component {
- *     constructor() { }
- * }
- */
-export function injectSubscriptions<TConstructor extends Function>(target: TConstructor): TConstructor;
-
-/**
- * Method Decorator for injecting subscriptions defined by `@on` and `@once` annotations during method call.
- * @example
- * class Component {
- *     @injectSubscriptions
- *     componentDidMount() { }
- * }
- */
-export function injectSubscriptions(target: Object, key: string | symbol): void;
-
-/**
  * Utility function for injecting subscriptions defined by `@on` and `@once` annotations.
  * @example
  * class Component {
@@ -333,49 +318,32 @@ export function injectSubscriptions(target: Object, key: string | symbol): void;
  *         injectSubscriptions(this);
  *     }
  * }
- */
-export function injectSubscriptions(target: Object): void;
-
-export function injectSubscriptions(
-    target: Function | Object, key?: string | symbol,
-    descriptor?: TypedPropertyDescriptor<Function>
-): TypedPropertyDescriptor<Function> | Function | void {
-    if (arguments.length === 3) { // ES5+ method decorator
-        descriptor = descriptor || Object.getOwnPropertyDescriptor(target, key);
-        descriptor.value = decorateMethod(descriptor.value, logic);
-        return descriptor;
-    } else if (arguments.length === 2) { // ES3 method decorator
-        target[key] = decorateMethod(target[key], logic);
-        return;
-    } else if (target instanceof Function) { // constructor decorator
-        return decorateClass(target, logic);
-    } else { // explicit invocation
-        logic.call(target);
-        return;
-    }
-
-    function logic() {
-        const handlers: Handler[] = this[_handlers];
-        if (handlers !== void 0 && !this.hasOwnProperty(_subscriptions)) {
-            this[_subscriptions] = handlers.map(h => {
-                const method: Function = this[h.key].bind(this);
-                return h.once
-                    ? h.emitter.once(...h.args, method)
-                    : h.emitter.on(...h.args, method);
-            });
-        }
-    }
-}
-
-/**
- * Method Decorator for disposing all injected subscriptions during method call.
- * @example
- * class Component {
- *     @disposeSubscriptions
- *     componentWillUnmount() { }
+ * class Service {
+ *     constructor() {
+ *         injectSubscriptions(this, [
+ *             Emitter.on("firstEvent", this.onFirstEvent.bind(this)),
+ *         ]);
+ *     }
  * }
  */
-export function disposeSubscriptions(target: Object, key: string | symbol): void;
+export function injectSubscriptions(target: Object, subscriptions?: Subscription[]): void {
+    const handlers: Handler[] = target[_handlers];
+    if (handlers !== void 0 && !target.hasOwnProperty(_subscriptions)) {
+        target[_subscriptions] = handlers.map(h => {
+            const method: Function = target[h.key].bind(target);
+            return h.once
+                ? h.emitter.once(...h.args, method)
+                : h.emitter.on(...h.args, method);
+        });
+    }
+    if (subscriptions !== void 0) {
+        if (!target.hasOwnProperty(_subscriptions)) {
+            target[_subscriptions] = subscriptions;
+        } else {
+            target[_subscriptions].push(...subscriptions);
+        }   
+    }
+}
 
 /**
  * Utility function for disposing all injected subscriptions.
@@ -386,27 +354,10 @@ export function disposeSubscriptions(target: Object, key: string | symbol): void
  *     }
  * }
  */
-export function disposeSubscriptions(target: Object): void;
-
-export function disposeSubscriptions(
-    target: Object, key?: string | symbol,
-    descriptor?: TypedPropertyDescriptor<Function>
-): TypedPropertyDescriptor<Function> | Function | void {
-    if (arguments.length === 3) { // ES5+ method decorator
-        descriptor = descriptor || Object.getOwnPropertyDescriptor(target, key);
-        descriptor.value = decorateMethod(descriptor.value, logic);
-        return descriptor;
-    } else if (arguments.length === 2) { // ES3 method decorator
-        target[key] = decorateMethod(target[key], logic);
-    } else { // explicit invocation
-        logic.call(target);
-    }
-
-    function logic() {
-        const subscriptions: Subscription[] = this[_subscriptions];
-        if (subscriptions !== void 0) {
-            subscriptions.forEach(s => { s.dispose(); });
-            delete this[_subscriptions];
-        }
+export function disposeSubscriptions(target: Object): void {
+    const subscriptions: Subscription[] = target[_subscriptions];
+    if (subscriptions !== void 0) {
+        subscriptions.forEach(s => { s.dispose(); });
+        delete target[_subscriptions];
     }
 }

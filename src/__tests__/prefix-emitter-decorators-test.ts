@@ -13,15 +13,18 @@ const firstEmitter: DoubleEmitter<string, string> = new PrefixEmitter();
 const secondEmitter: VoidEmitter = new PrefixEmitter();
 
 describe("Emitter Directives", () => {
-
-    @injectSubscriptions
     class Component {
         onInitCalls = 0;
         onEventCalls = 0;
         onBothCalls = 0;
 
-        @disposeSubscriptions
-        dispose() { }
+        constructor() {
+            injectSubscriptions(this);
+        }
+
+        dispose() {
+            disposeSubscriptions(this);
+        }
 
         @once(firstEmitter, "init")
         onInit(msg: string) {
@@ -41,7 +44,7 @@ describe("Emitter Directives", () => {
         }
     }
 
-    it("should inject and dispose subscriptions by decorators", () => {
+    it("should inject and dispose subscriptions", () => {
         const component = new Component();
 
         firstEmitter.emit("init", "init-1");
@@ -114,43 +117,15 @@ describe("Emitter Directives", () => {
         expect(component.onEventCalls).toBe(2);
     });
 
-    class MountableComponent {
-        onEventCalls = 0;
-
-        @injectSubscriptions
-        mount() { }
-
-        @disposeSubscriptions
-        unmount() { }
-
-        @on(firstEmitter, "event")
-        onEvent(msg: string) {
-            this.onEventCalls++;
+    class IdempotentComponent extends Component {
+        constructor() {
+            super();
+            injectSubscriptions(this);
+            injectSubscriptions(this);
         }
-    };
+    }
 
-    it("should inject subscriptions by Method Decorator", () => {
-        const component = new MountableComponent();
-
-        firstEmitter.emit("event", "event-1");
-
-        component.mount();
-
-        firstEmitter.emit("event", "event-2");
-        firstEmitter.emit("event", "event-3");
-
-        component.unmount();
-
-        firstEmitter.emit("event", "event-4");
-
-        expect(component.onEventCalls).toBe(2);
-    });
-
-    @injectSubscriptions
-    @injectSubscriptions
-    class IdempotentComponent extends Component {}
-
-    it("should inject subscriptions by multiple Class Decorators like by single decorator", () => {
+    it("should inject subscriptions once by class instance", () => {
         const component = new IdempotentComponent();
 
         firstEmitter.emit("event", "event-1");
@@ -161,42 +136,19 @@ describe("Emitter Directives", () => {
         expect(component.onEventCalls).toBe(2);
     });
 
-    class IdempotentMountableComponent extends MountableComponent {
-        @injectSubscriptions
-        @injectSubscriptions
-        mountIdempotent() { }
-    }
+    
 
-    it("should inject subscriptions by multiple Method Decorators like by single decorator", () => {
-
-        const component = new IdempotentMountableComponent();
-
-        component.mount();
-        component.unmount();
-
-        firstEmitter.emit("event", "event-1");
-
-        component.mount();
-        component.mountIdempotent();
-
-        firstEmitter.emit("event", "event-2");
-        firstEmitter.emit("event", "event-3");
-
-        component.unmount();
-
-        expect(component.onEventCalls).toBe(2);
-    });
-
-    @injectSubscriptions
     class Base {
         public onBaseCalls: number;
 
         constructor() {
             this.onBaseCalls = 0;
+            injectSubscriptions(this);
         }
 
-        @disposeSubscriptions
-        dispose() { }
+        dispose() {
+            disposeSubscriptions(this);
+        }
 
         @on(firstEmitter)
         onFirst(): void {
@@ -251,29 +203,6 @@ describe("Emitter Directives", () => {
         expect(derived.onOverriddenCalls).toBe(4);
     });
 
-    it("should preserve decorated class prototype, name, length and static fields", () => {
-        class PlainClass { }
-
-        @injectSubscriptions
-        class DecoratedClass extends PlainClass {
-            constructor(a: any, b: any, c: any) {
-                super();
-            }
-
-            static Field = { foo: "bar" };
-        }
-
-        expect(DecoratedClass.name).toBe("DecoratedClass");
-        expect(DecoratedClass.length).toBe(3);
-
-        const instance = new DecoratedClass(1, 2, 3);
-
-        expect(instance instanceof DecoratedClass).toBeTruthy();
-        expect(instance instanceof PlainClass).toBeTruthy();
-
-        expect(DecoratedClass.Field).toEqual({ foo: "bar" });
-    });
-
     it("should be composable with other decorators", () => {
         let log: string[] = [];
         function logDecorator(target: Object, key: string, descriptor: PropertyDescriptor) {
@@ -297,13 +226,15 @@ describe("Emitter Directives", () => {
         class MountableComponent {
             onEventCalls = 0;
 
-            @injectSubscriptions
             @logDecorator
-            mount() { }
+            mount() {
+                injectSubscriptions(this);
+            }
 
-            @disposeSubscriptions
             @logDecorator
-            unmount() { }
+            unmount() {
+                disposeSubscriptions(this);
+            }
 
             @on(firstEmitter, "event")
             @logDecorator
@@ -327,5 +258,35 @@ describe("Emitter Directives", () => {
 
         expect(component.onEventCalls).toBe(2);
         expect(log).toEqual(["mount", "onEvent", "onEvent", "unmount"]);
+    });
+
+    it("should inject additional subscriptions", () => {
+        class MyComponent {
+            onEventCalls = 0;
+
+            constructor() {
+                injectSubscriptions(this, [
+                    firstEmitter.on("event", this.onEvent.bind(this)),
+                    firstEmitter.on("event", this.onEvent.bind(this)),
+                ]);
+            }
+
+            dispose() {
+                disposeSubscriptions(this);
+            }
+
+            @on(firstEmitter, "event")
+            onEvent(arg: string) {
+                this.onEventCalls++;
+            }
+        }
+
+        let component = new MyComponent();
+        firstEmitter.emit("event", "arg");
+        
+        component.dispose();
+        firstEmitter.emit("event", "arg");
+
+        expect(component.onEventCalls).toBe(3);
     });
 });

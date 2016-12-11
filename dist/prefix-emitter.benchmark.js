@@ -513,28 +513,13 @@ function assign(target, source) {
  * @param logic Function: injected logic
  * @returns Function
  */
-var decorateMethod = new Function("target", "logic", "\n    switch (target.length) {" + repeat(16, function (l) { return "\n        " + (l < 16 ? "case " + l : "default") + ": return function (" + repeat(l, function (i) { return "v" + i; }, ", ") + ") {\n            logic.apply(this, arguments);\n            return target.apply(this, arguments);\n        };"; }) + "\n    }\n");
+
 /**
  * Build new constructor from given one with injected logic at the beginning of constructor call.
  * @param target Function: target constructor
  * @param logic Function: injected logic
  * @returns Function
  */
-function decorateClass(target, logic) {
-    // unique prefix for Function constructor for
-    // eliminate conflicts with `target` functions names
-    var pr = "bvjxRy0LjL9D";
-    // Code generation is used to preserve target's `.name` and `.length`
-    // It is about 30x slower than simple funciton wrapping
-    // But it is slill less than 5 microseconds per call
-    // So if you have 200 decorated classes it took less then 1ms
-    var factory = new Function(pr + "target", pr + "logic", "\n        return function " + target.name + "(" + repeat(target.length, function (i) { return "v" + i; }, ", ") + ") {\n            " + pr + "logic.apply(this, arguments);\n            return " + pr + "target.apply(this, arguments);\n        };\n    ");
-    var constructor = factory(target, logic);
-    // preserve target's prototype and static fields
-    constructor.prototype = target.prototype;
-    assign(constructor, target);
-    return constructor;
-}
 
 /**
 * Copyright (c) 2016 Dmitry Panyushkin
@@ -633,6 +618,10 @@ var EmitterSubscription = (function () {
     };
     return EmitterSubscription;
 }());
+/**
+ * Alias for importing PrefixEmitter from global scope
+ */
+
 /**
  * Event Emitter which can bind handlers to events at some sequence of prefixes.
  * @example
@@ -771,6 +760,33 @@ var _subscriptions = _Symbol("__prefix_emitter_subscriptions_");
  * class Component {
  *     @once(emitter, "event")
  *     selfDisposingHandler(arg: any) { }
+ * }
+ */
+
+/**
+ * Utility function for injecting subscriptions defined by `@on` and `@once` annotations.
+ * @example
+ * class Component {
+ *     componentDidMount() {
+ *         injectSubscriptions(this);
+ *     }
+ * }
+ * class Service {
+ *     constructor() {
+ *         injectSubscriptions(this, [
+ *             Emitter.on("firstEvent", this.onFirstEvent.bind(this)),
+ *         ]);
+ *     }
+ * }
+ */
+
+/**
+ * Utility function for disposing all injected subscriptions.
+ * @example
+ * class Component {
+ *     componentWillUnmount() {
+ *         disposeSubscriptions(this);
+ *     }
  * }
  */
 
