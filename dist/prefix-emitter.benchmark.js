@@ -619,10 +619,6 @@ var EmitterSubscription = (function () {
     return EmitterSubscription;
 }());
 /**
- * Alias for importing PrefixEmitter from global scope
- */
-
-/**
  * Event Emitter which can bind handlers to events at some sequence of prefixes.
  * @example
  * const emitter = new PrefixEmitter();
@@ -738,6 +734,10 @@ var PrefixEmitter = (function () {
     };
     return PrefixEmitter;
 }());
+/**
+ * Alias for importing PrefixEmitter from global scope
+ */
+
 var _handlers = _Symbol("__prefix_emitter_handlers_");
 var _subscriptions = _Symbol("__prefix_emitter_subscriptions_");
 /**

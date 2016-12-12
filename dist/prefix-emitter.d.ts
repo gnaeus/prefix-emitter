@@ -50,10 +50,6 @@ export interface DoubleEmitter<TEvent, TArg> {
     emit(event: TEvent, arg: TArg): void;
 }
 /**
- * Alias for importing PrefixEmitter from global scope
- */
-export declare const Emitter: typeof PrefixEmitter;
-/**
  * Event Emitter which can bind handlers to events at some sequence of prefixes.
  * @example
  * const emitter = new PrefixEmitter();
@@ -91,6 +87,10 @@ export declare class PrefixEmitter implements VoidEmitter, SingleEmitter<any>, D
      */
     emit(...args: any[]): void;
 }
+/**
+ * Alias for importing PrefixEmitter from global scope
+ */
+export declare const Emitter: typeof PrefixEmitter;
 export declare function on(emitter: VoidEmitter): MethodDecorator;
 export declare function on<T>(emitter: SingleEmitter<T>): MethodDecorator;
 export declare function on<T>(emitter: SingleEmitter<T>, arg: T): MethodDecorator;

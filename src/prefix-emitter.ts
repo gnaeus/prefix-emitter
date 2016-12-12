@@ -126,11 +126,6 @@ export interface DoubleEmitter<TEvent, TArg> {
 }
 
 /**
- * Alias for importing PrefixEmitter from global scope
- */
-export const Emitter = PrefixEmitter;
-
-/**
  * Event Emitter which can bind handlers to events at some sequence of prefixes.
  * @example
  * const emitter = new PrefixEmitter();
@@ -235,6 +230,11 @@ export class PrefixEmitter implements VoidEmitter, SingleEmitter<any>, DoubleEmi
         }
     }
 }
+
+/**
+ * Alias for importing PrefixEmitter from global scope
+ */
+export const Emitter = PrefixEmitter;
 
 interface Handler {
     emitter: PrefixEmitter;
