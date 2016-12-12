@@ -5,7 +5,7 @@ __Simple Event Emitter for ES6 and TypeScript based on Prefix Tree__
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/gnaeus/knockout-decorators/master/LICENSE)
 [![npm version](https://img.shields.io/npm/v/prefix-emitter.svg?style=flat)](https://www.npmjs.com/package/prefix-emitter)
 
-Prefix Emitter is a small library (1.7KB min+gz) with functionality like Node's Event Emitter.
+Prefix Emitter is a small library (1.3KB min+gz) with functionality like Node's Event Emitter.
 But event listeners can be subscribed to any predefined sequence of anguments (topic) instead of single event name.
 
 ### Key Features
@@ -94,31 +94,14 @@ emitter.emit("event", "bar"); // ➜
 
 ### <a name="prefix-emitter-decorators"></a>Decorators
 Methods of some class can be marked as event listeners by using `@on` and `@once` Method Decprators.
-Then subscriptions will be created by `@injectSubscriptions` and automatically disposed by `@disposeSubscriptions` decorators.
+Then subscriptions will be created by `injectSubscriptions` utility function and disposed by `disposeSubscriptions` function.
 See example:
+
 ```js
 import { on, once, injectSubscriptions, disposeSubscriptions, PrefixEmitter } from "prefix-emitter";
 
 const emitter = new PrefixEmitter();
 
-class Component {
-  @injectSubscriptions
-  componentDidMount() { }
-  
-  @once(emitter, "first")
-  onFirstEvent(arg) { }
-  
-  @once(emitter, "second")
-  onSecondEvent(arg) { }
-  
-  @disposeSubscriptions
-  componentWillUnmount() { }
-}
-```
-
-Subscriptions can be injected and disposed by Method Decorators (like in example above)
-or manually by using `injectSubscriptions()` `disposeSubscriptions()` as functions:
-```js
 class Component {
   componentDidMount() {
     injectSubscriptions(this);
@@ -127,19 +110,35 @@ class Component {
   componentWillUnmount() {
     disposeSubscriptions(this);
   }
+  
+  @on(emitter, "first")
+  onFirstEvent(arg) { }
+  
+  @once(emitter, "second")
+  onSecondEvent(arg) { }
 }
 ```
 
-Also subscriptions can be injected by `@injectSubscriptions` as Class Decorator during constructor call:
+Also existing subscriptions can be passed to `injectSubscriptions` function as second parameter:
+
 ```js
-@injectSubscriptions
+const emitter = new PrefixEmitter();
+
 class Component {
   constructor() {
-    // some stuff
+    injectSubscriptions(this, [
+      emitter.on("first", this.onFirstEvent.bind(this)),
+      emitter.once("second", this.onSecondEvent.bind(this)),
+    ]);
   }
   
-  @disposeSubscriptions
-  dispose() { }
+  dispose() {
+    disposeSubscriptions(this);
+  }
+  
+  onFirstEvent(arg) { }
+  
+  onSecondEvent(arg) { }
 }
 ```
 
@@ -203,9 +202,19 @@ a = 4; b = 5;
 ```
 
 ---
-### TypeScript Definitions
-TypeScript definitions are packaged together with `js` files in `/dist` folder.
-And it could be installed automatically with NPM package using [typings](https://www.npmjs.com/package/typings) utility.
+### Usage in global scope
+For usage in browser (without module loaders) the package registers global variable named `PerfixEmitter`.
+
+And the **class** `PerfixEmitter` has an alias named `Emitter`.
+
+```html
+<script src="/{path_to_vendor_scrpts}/prefix-emitter.js"></script>
+```
+```js
+const { Emitter, on, once, injectSubscriptions, disposeSubscriptions } = PrefixEmitter;
+
+const myEmitter = new Emitter();
+```
 
 ### Benchmarks
 To run benchmarks please type `npm run benchmarks` in console or open `./benchmark.html` in browser.
